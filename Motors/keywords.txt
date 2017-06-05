@@ -1,0 +1,21 @@
+## Classes		KEYWORD1
+BipolarStepper			KEYWORD1
+DCmotor				KEYWORD1
+
+## Functions		KEYWORD2
+GetCurrentStep			KEYWORD2
+GetCurrentDegree		KEYWORD2
+IsRotating			KEYWORD2
+IsFinished			KEYWORD2
+IsPaused			KEYWORD2
+Scan				KEYWORD2
+
+## Methods		KEYWORD3
+Continue			KEYWORD3
+Pause				KEYWORD3
+Rotate				KEYWORD3
+Reverse				KEYWORD3
+Stop				KEYWORD3
+Update				KEYWORD3
+
+## Constants		LITERAL1
