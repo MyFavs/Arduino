@@ -26,6 +26,13 @@ class Ultrasoon
 	
 	Ultrasoon (int tPin, int ePin)
 	{
+		Initalize(tPin, ePin);
+	}
+
+	// -- Commands --
+
+	void Initalize (int tPin, int ePin)
+	{
 		pinMode(trigPin, OUTPUT);
 		pinMode(echoPin, INPUT);
 		trigPin = tPin;

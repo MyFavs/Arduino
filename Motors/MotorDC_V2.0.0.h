@@ -51,11 +51,16 @@ class MotorDC
 
     MotorDC(int RPWM, int LPWM)
     {
-		initializePin(0, RPWM);
-		initializePin(1, LPWM);
+		initialize(RPWM, LPWM);
     }
 	
 	// --Commands--
+
+	void Initialize(int RPWM, int LPWM)
+    {
+		initializePin(0, RPWM);
+		initializePin(1, LPWM);
+    }
 	
 	void Rotate(int speed)
 	{
@@ -88,6 +93,11 @@ class MotorDC
 	{
 		_direction = 0;
 		setMotorState();
+	}
+
+	bool IsMoving()
+	{
+		return (_direction != 0);
 	}
 };
 

@@ -148,15 +148,21 @@ class BipolarStepper
 
     BipolarStepper(int pin1, int pin2, int pin3, int pin4)
     {
-		initializePin(0, pin1);
-		initializePin(1, pin2);
-		initializePin(2, pin3);
-		initializePin(3, pin4);
+		initalize(pin1, pin2, pin3, pin4);
     }
 	
 	// -------------------------------------------------
 	// -- Commands
 	// -------------------------------------------------
+
+	void Initialize(int pin1, int pin2, int pin3, int pin4)
+    {
+		initializePin(0, pin1);
+		initializePin(1, pin2);
+		initializePin(2, pin3);
+		initializePin(3, pin4);
+    }
+
 	
     void Rotate(int degree, int spd)  // (+-Graden,+-Snelheid)
 	{
