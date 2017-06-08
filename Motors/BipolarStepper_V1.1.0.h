@@ -27,6 +27,8 @@ class BipolarStepper
     int _speed;
     int _step;
 
+	unsigned long _time = millis();
+
     void initializePin(int id, int pin)
     {
       _motorPin[id] = pin;
@@ -278,7 +280,7 @@ class BipolarStepper
 			return;
 		}
 
-		if (millis() % _speed == 0) // Speed how fast the motor is running
+		if (_time % _speed == 0) // Speed how fast the motor is running
 		{
 			rotateMotor();
 		}
@@ -314,6 +316,10 @@ class BipolarStepper
 		return map(_step, 0, _stepsInMotor, 0, 359);
 	}
 
+	void SetTime(unsigned long _updateTime)
+    {
+        _time = updateTime;
+    }
 };
 
 #endif   // BipolarStepper_h

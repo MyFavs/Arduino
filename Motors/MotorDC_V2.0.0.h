@@ -15,6 +15,9 @@ class MotorDC
 	
 	int _speed = 0;
 	int _direction = 0;
+
+	unsigned long _time = millis();
+	unsigned long _rotationTime;
 	
 	void initializePin(int id, int pin)
     {
@@ -62,8 +65,14 @@ class MotorDC
 		initializePin(1, LPWM);
     }
 	
-	void Rotate(int speed)
+	void Rotate (int speed)
 	{
+		Rotate(speed, 0);
+	}
+
+	void Rotate(int speed, int rotationTime)
+	{
+		_rotationTime = rotationTime;
 		_speed = speed;
 		if (_speed == 0)
 		{
@@ -92,6 +101,7 @@ class MotorDC
 	void Stop()
 	{
 		_direction = 0;
+		_rotationTime = 0;
 		setMotorState();
 	}
 
@@ -99,6 +109,22 @@ class MotorDC
 	{
 		return (_direction != 0);
 	}
+
+	void Update()
+	{
+		if (_rotationTime > 0)
+		{
+			if (_time % _rotationTime == 0)
+			{
+				Stop();
+			}
+		}
+	}
+
+    void SetTime(unsigned long _updateTime)
+    {
+        _time = updateTime;
+    }
 };
 
 #endif   // MotorDC_h
