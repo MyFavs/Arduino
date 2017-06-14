@@ -121,7 +121,7 @@ class MotorDC
 		}
 	}
 
-    void SetTime(unsigned long _updateTime)
+    void SetTime(unsigned long updateTime)
     {
         _time = updateTime;
     }

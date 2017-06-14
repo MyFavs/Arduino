@@ -23,6 +23,9 @@ class AutomatedGuidedVehicle
 
     unsigned long _time =  millis();
 
+    const int _rotatingSpeed = 8;
+    const int _movingSpeed = 8;
+
     BipolarStepper _stepper;
     MotorDC _motor;
 
@@ -119,16 +122,34 @@ class AutomatedGuidedVehicle
     // -- Commands
     // -------------------------------------------------
 
-    void Forward()
+    void Forward(int moveTime)
     {
+        _motor.Rotate(_movingSpeed, moveTime);
     }
 
-    void Dodge()
+    void Backward(int moveTime)
     {
+        _motor.Rotate(_movingSpeed, moveTime);
     }
 
-    void TurnAround()
+    // void Dodge()
+    // {
+
+    // }
+
+    // void TurnAround()
+    // {
+
+    // }
+
+    void TurnRight(int degree)
     {
+        _stepper.Rotate(degree, _rotatingSpeed);
+    }
+
+    void TurnLeft(int degree)
+    {
+        _stepper.Rotate(-degree, _rotatingSpeed);
     }
 
     void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
@@ -163,7 +184,7 @@ class AutomatedGuidedVehicle
 
     bool IsTurning()
     {
-        return _turning;
+        return (_stepper.IsRotating() != 0);
     }
 
     bool IsAtWall()

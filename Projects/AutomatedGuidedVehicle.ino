@@ -1,6 +1,7 @@
 #include <AutomatedGuidedVehicle.h>
 
 AutomatedGuidedVehicle vehicle;
+Command_Dodge dodge(vehicle);
 
 int state = 0;
 unsigned long _time = millis();
@@ -12,8 +13,13 @@ void setup()
     vehicle.InitalizeMotor(6, 7);
     vehicle.Sensors.InitalizeUltrasoon(2, 4, 3, 5);
     vehicle.Sensors.InitalizeDetectors(40, 41);
+    
 //    vehicle.InitalizeButtons(42, 43, 44); // Left Turn Stepper, Right Turn Stepper, Start Process
 }
+
+bool executingMoveToMat = false;
+bool executing
+
 
 void loop()
 {
@@ -29,7 +35,7 @@ void loop()
         case 1:
             if (!vehicle.IsMovingToMat())
             {
-                vehicle.MoveToMat();
+                moveToMat();
             }
             else if (vehicle.HasMovedOnMat())
             {
@@ -37,20 +43,88 @@ void loop()
             }
             break;
         case 2:
-            if (vehicle.HasMovedToMat())
-            {
-                
-            }
+
             break;
     }
 
     vehicle.Update();
+    updateMoveToMat();
+}
+
+void updateMoveToMat()
+{
+    if (!isExecutingCommand())
+    {
+        return;
+    }
+
+    if (needsToMoveToMat)
+    {
+        vehicle.moveToMat();
+    }
+
+    if (hasMovedToMat)
+    {
+        vehicle.GoOnMat();
+    }
+}
+
+void updateRotateLeft()
+{
+    if (!isExecutingCommand())
+    {
+        return;
+    }
+
+    if (needsToRotateLeft)
+    {
+        vehicle.TurnLeft();
+    }
+}
+
+void updateRotateRight()
+{
+    if (!isExecutingCommand())
+    {
+        return;
+    }
+
+    if (needsToRotateRight)
+    {
+        vehicle.TurnRight();
+    }
+}
+
+void updateDodge()
+{
+    if (!isExecutingCommand())
+    {
+        return;
+    }
+
+    if (needsToDodge)
+    {
+        vehicle.Dodge();
+    }
+}
+
+void updateMoveForward()
+{
+    if (!isExecutingCommand())
+    {
+        return;
+    }
+
+    if (needsToMoveForward)
+    {
+        vehicle.Forward();
+    }
 }
 
 void moveToMat()
 {
     // 1) rijd naar mat toe
-    state = 1;
+    executingMoveToMat = true;
     
     // 2) stop als je op de mat bent (controle IMU)
 }
@@ -85,4 +159,29 @@ void dodge()
 void moveForward()
 {
     // totdat er een ding is of het einde van de mat
+}
+
+void moveBackward()
+{
+    
+}
+
+bool isExecutingCommand()
+{
+    if (vehicle.IsMoving())
+    {
+        return true;
+    }
+
+    if (executingMoveToMat())
+    {
+        return true;
+    }
+
+}
+
+void clearAllCommands()
+{
+    executingMoveToMat = false;
+
 }
