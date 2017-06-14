@@ -71,14 +71,14 @@ class AutomatedGuidedVehicle
             return;
         }
 
-        if (detectorRight == 0 && detectorLeft == 0)
+        if (Sensors.IsDetected())
         {
             _hitWall = true;
             Stop();
             return;
         }
 
-        if (detectorRight == 0 || (startTurnAngle + 90 == IMU.GetCurrentRotation()))
+        if (Sensors.IsDetectedRight() || (startTurnAngle + 90 == IMU.GetCurrentRotation()))
         {
             _hitWall = true;
             Stop();

@@ -50,6 +50,8 @@ void loop()
 void moveToMat()
 {
     // 1) rijd naar mat toe
+    state = 1;
+    
     // 2) stop als je op de mat bent (controle IMU)
 }
 
