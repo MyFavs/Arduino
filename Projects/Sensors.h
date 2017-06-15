@@ -24,13 +24,13 @@ class InternalSensors
     const int DETECTOR_LEFT = 4;
     const int DETECTOR_RIGHT = 8;
 
-    void InitalizeUltrasoon(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
+    void InitalizeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
     {
         _ultrasoonLeft(LeftTrigPin, LeftEchoPin);
         _ultrasoonRight(RightTrigPin, RightEchoPin);
     }
 
-    void InitalizeDetectors(int pinLeft, int pinRight)
+    void InitalizeDetectorPins(int pinLeft, int pinRight)
     {
         pinMode(pinLeft, INPUT);
         _detectorLeft = pinLeft;

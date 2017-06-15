@@ -29,38 +29,6 @@ class AutomatedGuidedVehicle
     BipolarStepper _stepper;
     MotorDC _motor;
 
-    void movingToMat()
-    {
-        if (_time % 300 != 0)
-        {
-            return;
-        }
-
-        if (Sensors.IsDetected())
-        {   
-            _isMovingToMat = false;
-            _hasMovedToMat = true;
-            GoOnMat();
-        }
-    }
-
-    void goOnMat()
-    {
-        if (_time % 300 != 0)
-        {
-            return;
-        }
-
-        // ImU detection z- axis
-
-        if (!_motor.IsMoving())
-        {
-            _goOnMat = false;
-            _onMat = true;
-        }
-
-    }
-
     void moveLane()
     {
         Motor.Rotate(8); //------------------------> 1x aanroepen
@@ -96,10 +64,7 @@ class AutomatedGuidedVehicle
         }
     }
 
-    void Stop()
-    {
-        Motor.Stop();
-    }
+    
 
   public:
     // Constructor
@@ -121,6 +86,11 @@ class AutomatedGuidedVehicle
     // -------------------------------------------------
     // -- Commands
     // -------------------------------------------------
+
+    void Stop()
+    {
+        Motor.Stop();
+    }
 
     void Forward(int moveTime)
     {
@@ -177,24 +147,9 @@ class AutomatedGuidedVehicle
         return _motor.IsMoving();
     }
 
-    bool IsDodging()
-    {
-        return _dodging;
-    }
-
     bool IsTurning()
     {
         return (_stepper.IsRotating() != 0);
-    }
-
-    bool IsAtWall()
-    {
-        return _hitWall;
-    }
-
-    bool ObjectDetected()
-    {
-        return _objectDetected;
     }
 
     bool IsMovingToMat()
