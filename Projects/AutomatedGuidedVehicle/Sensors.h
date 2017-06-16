@@ -21,6 +21,9 @@ class InternalSensors
     {
     }
 
+    const int ULTRASONIC_LEFT = 1;
+    const int ULTRASONIC_RIGHT = 2;
+
     const int DETECTOR_LEFT = 4;
     const int DETECTOR_RIGHT = 8;
 
@@ -76,19 +79,34 @@ class InternalSensors
         return _scanState;
     }
 
-    bool IsDetectedLeft()
+    bool IsGroundDetectedLeft()
     {
         return (_scanState & Sensors.DETECTOR_LEFT == Sensors.DETECTOR_LEFT);
     }
 
-    bool IsDetectedRight()
+    bool IsGroundDetectedRight()
     {
         return (_scanState & Sensors.DETECTOR_RIGHT == Sensors.DETECTOR_RIGHT);
     }
 
-    bool IsDetected()
+    bool IsGroundDetected()
     {
-        return (IsDetectedLeft() && IsDetectedRight());
+        return (IsGroundDetectedLeft() && IsGroundDetectedRight());
+    }
+
+    bool IsObjectDetectedLeft()
+    {
+        return (_scanState & Sensors.ULTRASONIC_LEFT == Sensors.ULTRASONIC_LEFT);
+    }
+
+    bool IsObjectDetectedRight()
+    {
+        return (_scanState & Sensors.ULTRASONIC_RIGHT == Sensors.ULTRASONIC_RIGHT);
+    }
+
+    bool IsObjectDetected()
+    {
+        return(IsObjectDetectedLeft() || IsObjectDetectedRight());
     }
 
 };

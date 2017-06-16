@@ -14,8 +14,14 @@ class Command_Dodge
     {
         switch(state)
         {
-            // 1) Achteruit
+            case 0:
+                return;
             case 1:
+                vehicle.Stop();
+                step++;
+                break;
+            // 1) Achteruit
+            case 2:
                 if (!vehicle.IsMoving())
                 {
                     vehicle.Backward(1000);
@@ -27,7 +33,7 @@ class Command_Dodge
                 }
                 break;
             // 2) draai 45 graden naar links
-            case 2:
+            case 3:
                 if (!vehicle.IsTurning())
                 {
                     vehicle.TurnLeft(45);
@@ -39,7 +45,7 @@ class Command_Dodge
                 }
                 break;
             // 3) vooruit x meter (IMU)
-            case 3:
+            case 4:
                 if (!vehicle.IsMoving())
                 {
                     vehicle.Forward(1000);
@@ -51,7 +57,7 @@ class Command_Dodge
                 }
                 break;
             // 4) draai 45 graden naar rechts
-            case 4:
+            case 5:
                 if (!vehicle.IsTurning())
                 {
                     vehicle.TurnRight(45);
@@ -63,7 +69,7 @@ class Command_Dodge
                 }
                 break;
             // 5) vooruit x meter (IMU)
-            case 5:
+            case 6:
                 if (!vehicle.IsMoving())
                 {
                     vehicle.Forward(1000);
@@ -75,7 +81,7 @@ class Command_Dodge
                 }
                 break;
             // 6) draai 45 graden naar rechts
-            case 6:
+            case 7:
                 if (!vehicle.IsTurning())
                 {
                     vehicle.TurnRight(45);
@@ -87,7 +93,7 @@ class Command_Dodge
                 }
                 break;
             // 7) vooruit x meter (IMU)
-            case 7:
+            case 8:
                 if (!vehicle.IsMoving())
                 {
                     vehicle.Forward(1000);
@@ -99,7 +105,7 @@ class Command_Dodge
                 }
                 break;
             // 8) draai 45 graden naar links
-            case 8:
+            case 9:
                 if (!vehicle.IsTurning())
                 {
                     vehicle.TurnLeft(45);
@@ -111,7 +117,7 @@ class Command_Dodge
                 }
                 break;
             // 9) vooruit x meter (IMU)
-            case 9:
+            case 10:
                 if (!vehicle.IsMoving())
                 {
                     vehicle.Forward(500);
