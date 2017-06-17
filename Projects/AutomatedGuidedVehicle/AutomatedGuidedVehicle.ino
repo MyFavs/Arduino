@@ -1,25 +1,32 @@
 #include "AutomatedGuidedVehicle.h"
+#include "Command_Dodge.h"
+#include "Command_Move.h"
+#include "Command_MoveForward.h"
+#include "Command_MoveToMat.h"
+#include "Command_Rotate.h"
+#include "Sensors.h"
 
 AutomatedGuidedVehicle vehicle;
+
 Command_Dodge cmd_Dodge(vehicle);
 Command_MoveToMat cmd_MoveToMat(vehicle);
 Command_Rotate cmd_Rotate(vehicle);
 Command_MoveForward cmd_MoveForward(vehicle);
-Command_Move cmd_Move(vehicle)
+Command_Move cmd_Move(vehicle);
 
-int state = -1;
 unsigned long _time = millis();
-
+int state = -1;
 bool _processing = false;
-unsigned long command = 0;
 
 void setup()
 {
     vehicle.SetTime(_time);
     vehicle.InitializeStepper(8, 9, 10, 11);
-    vehicle.InitalizeMotor(6, 7);
-    vehicle.Sensors.InitalizeUltrasonicPins(2, 4, 3, 5);
-    vehicle.Sensors.InitalizeDetectorPins(40, 41);
+    vehicle.InitializeMotor(6, 7);
+    vehicle.Sensors.InitializeUltrasonicPins(2, 4, 3, 5);
+    vehicle.Sensors.InitializeDetectorPins(40, 41);
+    vehicle.Sensors.InitializeRemoteControlPin(12);
+    pinMode(13, OUTPUT);
 }
 
 void loop()
@@ -27,27 +34,25 @@ void loop()
     // --------------AFSTANDSBEDIENING UITVRAGEN---------------
     if (!isExecutingCommand())
     {
-        switch (command)
+        if (vehicle.Sensors.Remote.Code > 0)
         {
-        case 0x00:
-            start();
-            break;
-        case 0x01:
-            break;
+            String command = vehicle.Sensors.Remote.Command;
+            if (command == "CH-")
+            {
+                digitalWrite(13, HIGH);
+            }
+            else
+            {
+                digitalWrite(13, LOW);
+            }
         }
     }
-
     processUpdate();
     vehicle.Update();
     cmd_Dodge.Update();
     cmd_MoveForward.Update();
     cmd_Move.Update();
     cmd_Rotate.Update();
-}
-
-void stop()
-{
-    vehicle.Stop();
 }
 
 bool isExecutingCommand()

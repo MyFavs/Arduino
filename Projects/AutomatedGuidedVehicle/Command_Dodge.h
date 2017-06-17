@@ -1,13 +1,20 @@
+#ifndef Command_Dodge_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Command_Dodge_h
+
+#include "AutomatedGuidedVehicle.h"
+
 class Command_Dodge
 {
     int state = 0;
-    AutomatedGuidedVehicle _vehicle;
+    AutomatedGuidedVehicle vehicle;
 
     public:
 
-    void Command_Dodge(AutomatedGuidedVehicle vehicle)
+    Command_Dodge() {}
+
+    Command_Dodge(AutomatedGuidedVehicle obj)
     {
-        _vehicle = vehicle;
+        vehicle = obj;
     }
 
     void Update()
@@ -18,7 +25,7 @@ class Command_Dodge
                 return;
             case 1:
                 vehicle.Stop();
-                step++;
+                state++;
                 break;
             // 1) Achteruit
             case 2:
@@ -142,6 +149,8 @@ class Command_Dodge
             state = 1;
     }
 };
+
+#endif // Command_Dodge_h
 
 
 

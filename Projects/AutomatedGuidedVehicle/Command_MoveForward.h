@@ -1,13 +1,20 @@
+#ifndef Command_MoveForward_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Command_MoveForward_h
+
+#include "AutomatedGuidedVehicle.h"
+
 class Command_MoveForward
 {
     bool move = false;
-    AutomatedGuidedVehicle _vehicle;
+    AutomatedGuidedVehicle vehicle;
 
     public:
 
-        void Command_MoveForward(AutomatedGuidedVehicle vehicle)
+        Command_MoveForward() {}
+
+        Command_MoveForward(AutomatedGuidedVehicle obj)
         {
-            _vehicle = vehicle;
+            vehicle = obj;
         }
 
         void Update()
@@ -29,8 +36,10 @@ class Command_MoveForward
             move = true;
         }
 
-        void IsFinished()
+        bool IsFinished()
         {
             return (!move);
         }
 };
+
+#endif // Command_MoveForward_h

@@ -54,7 +54,7 @@ class MotorDC
 
     MotorDC(int RPWM, int LPWM)
     {
-		initialize(RPWM, LPWM);
+		Initialize(RPWM, LPWM);
     }
 	
 	// --Commands--
@@ -87,7 +87,7 @@ class MotorDC
 		else
 		{
 			_direction = -1;
-			_speed = -_speed
+			_speed = -_speed;
 		}
 		setMotorState();
 	}

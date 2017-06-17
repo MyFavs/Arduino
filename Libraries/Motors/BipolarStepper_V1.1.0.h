@@ -150,7 +150,7 @@ class BipolarStepper
 
     BipolarStepper(int pin1, int pin2, int pin3, int pin4)
     {
-		initalize(pin1, pin2, pin3, pin4);
+		Initialize(pin1, pin2, pin3, pin4);
     }
 	
 	// -------------------------------------------------
@@ -316,7 +316,7 @@ class BipolarStepper
 		return map(_step, 0, _stepsInMotor, 0, 359);
 	}
 
-	void SetTime(unsigned long _updateTime)
+	void SetTime(unsigned long updateTime)
     {
         _time = updateTime;
     }

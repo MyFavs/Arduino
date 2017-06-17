@@ -1,14 +1,21 @@
+#ifndef Command_Rotate_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Command_Rotate_h
+
+#include "AutomatedGuidedVehicle.h"
+
 class Command_Rotate
 {
     int state = 0;
     int direction = 0;
-    AutomatedGuidedVehicle _vehicle;
+    AutomatedGuidedVehicle vehicle;
 
     public:
 
-        void Command_Rotate(AutomatedGuidedVehicle vehicle)
+        Command_Rotate() {}
+
+        Command_Rotate(AutomatedGuidedVehicle obj)
         {   
-            _vehicle = vehicle;
+            vehicle = obj;
         }
         void Update()
         {
@@ -47,9 +54,13 @@ class Command_Rotate
                     break;
                 case 3:     // 3) vooruit tot 90 graden gedraaid AGV (controle IMU) & controle einde mat
                     if (!vehicle.IsMoving())
-                        vehicle.Forward(60000);
-                    if (/* IMU.rotated(90) */true)
                     {
+                        vehicle.Forward(60000);
+                        vehicle.IMU.ResetZ();
+                    }
+                    if (vehicle.IMU.GetTotalRotationZ() >= 90 || vehicle.IMU.GetTotalRotationZ() <= -90)
+                    {
+                        vehicle.IMU.ResetZ();
                         vehicle.Stop();
                         state++;
                     }
@@ -88,8 +99,10 @@ class Command_Rotate
             state = 1;
         }
 
-        void IsFinished()
+        bool IsFinished()
         {
-            return (state == 0)
+            return (state == 0);
         }
 };
+
+#endif //Command_Rotate_h

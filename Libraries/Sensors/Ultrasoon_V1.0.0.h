@@ -11,7 +11,7 @@
 
 class Ultrasoon
 {
-	const int temp = 30;
+	int temp = 30;
 	
 	float duration;
 	int distance;
@@ -24,14 +24,14 @@ class Ultrasoon
 	
 	Ultrasoon() {}
 	
-	Ultrasoon (int tPin, int ePin)
+	Ultrasoon(int tPin, int ePin)
 	{
-		Initalize(tPin, ePin);
+		Initialize(tPin, ePin);
 	}
 
 	// -- Commands --
 
-	void Initalize (int tPin, int ePin)
+	void Initialize(int tPin, int ePin)
 	{
 		pinMode(trigPin, OUTPUT);
 		pinMode(echoPin, INPUT);

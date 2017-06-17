@@ -1,18 +1,32 @@
+#ifndef Command_Move_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Command_Move_h
+
+#include "AutomatedGuidedVehicle.h"
+
+// #include "Command_Dodge.h"
+// #include "Command_Move.h"
+// #include "Command_MoveForward.h"
+// #include "Command_Rotate.h"
+
 class Command_Move
 {
     int direction = 0;
     int state = 0;
 
     AutomatedGuidedVehicle vehicle;
-    Command_MoveForward cmd_moveForward(vehicle);
-    Command_Dodge cmd_dodge(vehicle);
-    Command_Rotate cmd_rotate(vehicle);
+    // Command_MoveForward vehicle.cmd_MoveForward1;
+    // Command_Dodge vehicle.cmd_Dodge;
+    // Command_Rotate vehicle.cmd_Rotate;
 
     public:
 
-        void Command_Move(AutomatedGuidedVehicle obj)
+        Command_Move() {}
+
+
+        Command_Move(AutomatedGuidedVehicle obj)
         {
             vehicle = obj;
+
         }
 
         void Update()
@@ -20,12 +34,13 @@ class Command_Move
             switch (state)
             {
                 case 1: 
-                    if (cmd_moveForward.IsFinished())
+                    if (vehicle.cmd_MoveForward.IsFinished())
                     {
+                        
                        Forward();
                     }
 
-                    if (cmd_moveForward.IsFinished())
+                    if (vehicle.cmd_MoveForward.IsFinished())
                     {
                         if (vehicle.Sensors.IsObjectDetected())
                         {
@@ -40,19 +55,19 @@ class Command_Move
 
                     break;
                 case 2:
-                    if (cmd_dodge.IsFinished())
+                    if (vehicle.cmd_Dodge.IsFinished())
                     {
                         Dodge();
                     }
 
-                    if (cmd_dodge.IsFinished())
+                    if (vehicle.cmd_Dodge.IsFinished())
                     {
                         state = 1;
                     }
                     break;
 
                 case 3:
-                    if (cmd_rotate.IsFinished())
+                    if (vehicle.cmd_Rotate.IsFinished())
                     {
                         if (direction == -1)
                         {
@@ -64,13 +79,13 @@ class Command_Move
                         }
                     }
 
-                    if (cmd_rotate.IsFinished())
+                    if (vehicle.cmd_Rotate.IsFinished())
                     {
                         state = 4;
                     }
                     break;
                 case 4:
-                    if (cmd_rotate.IsFinished())
+                    if (vehicle.cmd_Rotate.IsFinished())
                     {
                         if (direction == -1)
                         {
@@ -82,16 +97,16 @@ class Command_Move
                         }
                     }
 
-                    if (cmd_rotate.IsFinished())
+                    if (vehicle.cmd_Rotate.IsFinished())
                     {
                         state = 1;
                         direction = -direction;
                     }
                     break;
             }
-            cmd_rotate.Update();
-            cmd_dodge.Update();
-            cmd_moveForward.Update();
+            // vehicle.cmd_Rotate.Update();
+            // vehicle.cmd_Dodge.Update();
+            // vehicle.cmd_MoveForward1.Update();
         }
 
         void Start()
@@ -102,26 +117,33 @@ class Command_Move
 
         void Forward()
         {
-            cmd_moveForward.Start();
+            vehicle.cmd_MoveForward.Start();
         }
 
         void RotateLeft()
         {
-            cmd_Rotate.Left();
+            vehicle.cmd_Rotate.Left();
         }
 
         void RotateRight()
         {
-            cmd_Rotate.Right();
+            vehicle.cmd_Rotate.Right();
         }
 
         void Dodge()
         {
-            cmd_Dodge.Start();
+            vehicle.cmd_Dodge.Start();
         }
 
         bool IsFinished()
         {
             return (state == 0);
         }
+
+        Initialize(AutomatedGuidedVehicle obj)
+        {
+            vehicle = obj;
+        }
 };
+
+#endif // Command_Move_h

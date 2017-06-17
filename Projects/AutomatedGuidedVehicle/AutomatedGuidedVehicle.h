@@ -5,97 +5,109 @@
 #include <BipolarStepper_V1.1.0.h>
 #include <MotorDC_V2.0.0.h>
 #include "Sensors.h"
+#include <IMU_V1.0.0.h>
+
 
 class AutomatedGuidedVehicle
 {
-    unsigned long _time =  millis();
+    unsigned long _time = millis();
 
-    const int _rotatingSpeed = 8;
-    const int _movingSpeed = 8;
+    int _rotatingSpeed = 8;
+    int _movingSpeed = 8;
 
     BipolarStepper _stepper;
     MotorDC _motor;
 
-    public:
-        // Constructor
 
-        int DetectDistance = 150;
 
-        AutomatedGuidedVehicle() {}
+  public:
+    // Constructor
 
-        AutomatedGuidedVehicle()
-        {
-        }
+    int DetectDistance = 150;
+    InternalMeasurementUnit IMU;
 
-        // -------------------------------------------------
-        // -- Properties
-        //--------------------------------------------------
 
-        InternalSensors Sensors;
 
-        // -------------------------------------------------
-        // -- Commands
-        // -------------------------------------------------
+    AutomatedGuidedVehicle() {}
 
-        void Stop()
-        {
-            Motor.Stop();
-        }
+    // -------------------------------------------------
+    // -- Properties
+    //--------------------------------------------------
 
-        void Forward(int moveTime)
-        {
-            _motor.Rotate(_movingSpeed, moveTime);
-        }
+    InternalSensors Sensors;
 
-        void Backward(int moveTime)
-        {
-            _motor.Rotate(_movingSpeed, moveTime);
-        }
+    // -------------------------------------------------
+    // -- Commands
+    // -------------------------------------------------
 
-        void TurnRight(int degree)
-        {
-            _stepper.Rotate(degree, _rotatingSpeed);
-        }
+    void Stop()
+    {
+        _motor.Stop();
+    }
 
-        void TurnLeft(int degree)
-        {
-            _stepper.Rotate(-degree, _rotatingSpeed);
-        }
+    void Forward(int moveTime)
+    {
+        _motor.Rotate(_movingSpeed, moveTime);
+    }
 
-        void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
-        {
-            _stepper.Initalize(pin1, pin2, pin3, pin4);
-        }
+    void Backward(int moveTime)
+    {
+        _motor.Rotate(_movingSpeed, moveTime);
+    }
 
-        void InitalizeMotor(int RPWM, int LPWM)
-        {
-            _motor.Initalize(RPWM, LPWM);
-        }
+    void TurnRight(int degree)
+    {
+        _stepper.Rotate(degree, _rotatingSpeed);
+    }
 
-        bool IsMoving()
-        {
-            return _motor.IsMoving();
-        }
+    void TurnLeft(int degree)
+    {
+        _stepper.Rotate(-degree, _rotatingSpeed);
+    }
 
-        bool IsTurning()
-        {
-            return (_stepper.IsRotating() != 0);
-        }
+    void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
+    {
+        _stepper.Initialize(pin1, pin2, pin3, pin4);
+    }
 
-        void Update()
-        {
-            Sensors.Update();
-            _motor.Update();
-            _stepper.Update();
-        }
+    void InitializeMotor(int RPWM, int LPWM)
+    {
+        _motor.Initialize(RPWM, LPWM);
+    }
 
-        void SetTime(unsigned long _updateTime)
-        {
-            _time = updateTime;
-            Sensors.SetTime(_time);
-            _motor.SetTime(_time);
-            _stepper.SetTime(_time);
-        }
+    bool IsMoving()
+    {
+        return _motor.IsMoving();
+    }
+
+    bool IsTurning()
+    {
+        return (_stepper.IsRotating() != 0);
+    }
+
+    
+
+    void Update()
+    {
+
+        
+        IMU.Update();
+        Sensors.Update();
+        _motor.Update();
+        _stepper.Update();
+        
+
+    }
+
+    void SetTime(unsigned long updateTime)
+    {
+        _time = updateTime;
+        Sensors.SetTime(_time);
+        _motor.SetTime(_time);
+        _stepper.SetTime(_time);
+    }
+
+    
 };
 
-#endif   // AutomatedGuidedVehicle_h
+#endif // AutomatedGuidedVehicle_h

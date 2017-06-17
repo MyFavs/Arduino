@@ -1,13 +1,21 @@
+#ifndef Command_MoveToMat_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Command_MoveToMat_h
+
+#include "AutomatedGuidedVehicle.h"
+
 class Command_MoveToMat
 {
     int state = 0;
-    AutomatedGuidedVehicle _vehicle;
+    AutomatedGuidedVehicle vehicle;
+    unsigned long _time = millis();
 
     public:
 
-        void Command_MoveToMat(AutomatedGuidedVehicle vehicle)
+        Command_MoveToMat() {}
+
+        Command_MoveToMat(AutomatedGuidedVehicle obj)
         {
-            _vehicle = vehicle;
+            vehicle = obj;
         }
 
         void Update()
@@ -24,11 +32,11 @@ class Command_MoveToMat
                     if (!vehicle.IsMoving())
                         vehicle.Forward(60000);
 
-                    if (Sensors.IsDetected())
+                    if (vehicle.Sensors.IsGroundDetected())
                         state++;
                     break;
                 case 2:
-                    if (/* IMU.Leveled */true)
+                    if (vehicle.IMU.IsLevel())
                     {
                         vehicle.Stop();
                         state = 0;
@@ -37,9 +45,9 @@ class Command_MoveToMat
             }
         }
 
-        void IsFinished()
+        bool IsFinished()
         {
-            return (state == 0)
+            return (state == 0);
         }
 
         void Start()
@@ -48,3 +56,5 @@ class Command_MoveToMat
                 state = 1;
         }
 };
+
+#endif // Command_MoveToMat_h

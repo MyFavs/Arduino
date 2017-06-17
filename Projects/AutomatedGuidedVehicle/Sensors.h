@@ -2,6 +2,7 @@
 #define Sensors_h
 
 #include <Ultrasoon_V1.0.0.h>
+#include <RemoteControl_V1.0.0.h>
 
 class InternalSensors
 {   
@@ -13,27 +14,32 @@ class InternalSensors
     Ultrasoon _ultrasoonLeft;
     Ultrasoon _ultrasoonRight;
 
+    unsigned long _time = millis();
+
    public:
+
+    RemoteControl Remote;
 
     InternalSensors() {}
 
-    InternalSensors()
+    int ULTRASONIC_LEFT = 1;
+    int ULTRASONIC_RIGHT = 2;
+
+    int DETECTOR_LEFT = 4;
+    int DETECTOR_RIGHT = 8;
+
+    void InitializeRemoteControlPin(int pin)
     {
+        //Remote(pin);        // ERROR
     }
 
-    const int ULTRASONIC_LEFT = 1;
-    const int ULTRASONIC_RIGHT = 2;
-
-    const int DETECTOR_LEFT = 4;
-    const int DETECTOR_RIGHT = 8;
-
-    void InitalizeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
+    void InitializeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
     {
-        _ultrasoonLeft(LeftTrigPin, LeftEchoPin);
-        _ultrasoonRight(RightTrigPin, RightEchoPin);
+        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);           //ERROR
+        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin);        //ERROR
     }
 
-    void InitalizeDetectorPins(int pinLeft, int pinRight)
+    void InitializeDetectorPins(int pinLeft, int pinRight)
     {
         pinMode(pinLeft, INPUT);
         _detectorLeft = pinLeft;
@@ -43,6 +49,12 @@ class InternalSensors
 
     void Update()
     {
+        Remote.Update();
+
+        if (_time % 300 != 0)
+        {
+            return;
+        }
 
         _scanState = 0;
         int scannedLeft = _ultrasoonLeft.Scan();
@@ -67,9 +79,11 @@ class InternalSensors
         {
             _scanState += 8;
         }
+
+        
     }
 
-    void SetTime(unsigned long _updateTime)
+    void SetTime(unsigned long updateTime)
     {
         _time = updateTime;
     }
@@ -81,12 +95,12 @@ class InternalSensors
 
     bool IsGroundDetectedLeft()
     {
-        return (_scanState & Sensors.DETECTOR_LEFT == Sensors.DETECTOR_LEFT);
+        return (_scanState & DETECTOR_LEFT == DETECTOR_LEFT);
     }
 
     bool IsGroundDetectedRight()
     {
-        return (_scanState & Sensors.DETECTOR_RIGHT == Sensors.DETECTOR_RIGHT);
+        return (_scanState & DETECTOR_RIGHT == DETECTOR_RIGHT);
     }
 
     bool IsGroundDetected()
@@ -96,12 +110,12 @@ class InternalSensors
 
     bool IsObjectDetectedLeft()
     {
-        return (_scanState & Sensors.ULTRASONIC_LEFT == Sensors.ULTRASONIC_LEFT);
+        return (_scanState & ULTRASONIC_LEFT == ULTRASONIC_LEFT);
     }
 
     bool IsObjectDetectedRight()
     {
-        return (_scanState & Sensors.ULTRASONIC_RIGHT == Sensors.ULTRASONIC_RIGHT);
+        return (_scanState & ULTRASONIC_RIGHT == ULTRASONIC_RIGHT);
     }
 
     bool IsObjectDetected()
