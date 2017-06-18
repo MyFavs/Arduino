@@ -12,20 +12,24 @@ class Command_MoveForward
 
         Command_MoveForward() {}
 
-        Command_MoveForward(AutomatedGuidedVehicle obj)
+        Initialize(AutomatedGuidedVehicle* obj)
         {
-            vehicle = obj;
+            vehicle = *obj;
         }
 
         void Update()
         {
             if (!(vehicle.IsMoving()) && move)
             {
-                vehicle.Forward(60000);
+                Serial.print("Moving Forward..60000..  ");
+                Serial.println(vehicle.Name);
+                vehicle.Forward(1000);
             }
 
             if (vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected())
             {
+                Serial.print("Sensors detected!");
+                //Serial.println(vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected());
                 move = false;
                 vehicle.Stop();
             }

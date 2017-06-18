@@ -2,10 +2,10 @@
 #define Sensors_h
 
 #include <Ultrasoon_V1.0.0.h>
-#include <RemoteControl_V1.0.0.h>
+#include "AutomatedGuidedVehicle.h"
 
 class InternalSensors
-{   
+{
     int _detectorLeft;
     int _detectorRight;
 
@@ -14,13 +14,15 @@ class InternalSensors
     Ultrasoon _ultrasoonLeft;
     Ultrasoon _ultrasoonRight;
 
-    unsigned long _time = millis();
+    //AutomatedGuidedVehicle vehicle;
 
-   public:
-
-    RemoteControl Remote;
-
+  public:
     InternalSensors() {}
+
+    // InternalSensors(AutomatedGuidedVehicle obj)
+    // {
+    //     vehicle = obj;
+    // }
 
     int ULTRASONIC_LEFT = 1;
     int ULTRASONIC_RIGHT = 2;
@@ -35,8 +37,8 @@ class InternalSensors
 
     void InitializeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
     {
-        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);           //ERROR
-        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin);        //ERROR
+        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);    //ERROR
+        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin); //ERROR
     }
 
     void InitializeDetectorPins(int pinLeft, int pinRight)
@@ -49,9 +51,9 @@ class InternalSensors
 
     void Update()
     {
-        Remote.Update();
+        //Remote.Update();
 
-        if (_time % 300 != 0)
+        if (millis() % 300 != 0)
         {
             return;
         }
@@ -79,13 +81,6 @@ class InternalSensors
         {
             _scanState += 8;
         }
-
-        
-    }
-
-    void SetTime(unsigned long updateTime)
-    {
-        _time = updateTime;
     }
 
     int GetScanState()
@@ -120,9 +115,8 @@ class InternalSensors
 
     bool IsObjectDetected()
     {
-        return(IsObjectDetectedLeft() || IsObjectDetectedRight());
+        return (IsObjectDetectedLeft() || IsObjectDetectedRight());
     }
-
 };
 
 #endif

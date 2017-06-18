@@ -16,7 +16,7 @@ class MotorDC
 	int _speed = 0;
 	int _direction = 0;
 
-	unsigned long _time = millis();
+	unsigned long _time;
 	unsigned long _rotationTime;
 	
 	void initializePin(int id, int pin)
@@ -27,7 +27,11 @@ class MotorDC
 	
 	int setMotorState()
     {
+		Serial.print("Motor.setMotorState Speed=");
 		int speed = map(_speed, 0, 8, 0, 255);
+		Serial.println(speed);
+		Serial.print("Direction: ");
+		Serial.println(_direction);
 		switch(_direction)
 		{
 			case 0:									// Stop
@@ -72,6 +76,12 @@ class MotorDC
 
 	void Rotate(int speed, int rotationTime)
 	{
+		Serial.print("Motor.Rotate: ");
+		Serial.print(speed);
+		Serial.print(",");
+		Serial.println(rotationTime);
+
+		_time = millis();
 		_rotationTime = rotationTime;
 		_speed = speed;
 		if (_speed == 0)
@@ -100,6 +110,8 @@ class MotorDC
 	
 	void Stop()
 	{
+		Serial.println("Motor.Stopped");	
+		
 		_direction = 0;
 		_rotationTime = 0;
 		setMotorState();
@@ -112,9 +124,13 @@ class MotorDC
 
 	void Update()
 	{
+		Serial.print("Motor._rotationTime:");
+		Serial.print(_rotationTime);
+		Serial.print("  _time:");
+		Serial.println(millis());
 		if (_rotationTime > 0)
 		{
-			if (_time % _rotationTime == 0)
+			if (millis() > _time + _rotationTime)
 			{
 				Stop();
 			}

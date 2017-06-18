@@ -7,7 +7,6 @@ class Command_MoveToMat
 {
     int state = 0;
     AutomatedGuidedVehicle vehicle;
-    unsigned long _time = millis();
 
     public:
 
@@ -23,7 +22,7 @@ class Command_MoveToMat
             if (state == 0)
                 return;
 
-            if (_time % 100 != 0)
+            if (vehicle.Time % 100 != 0)
                 return;
                 
             switch(state)

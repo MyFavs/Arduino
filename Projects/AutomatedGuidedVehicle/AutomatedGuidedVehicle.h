@@ -10,7 +10,7 @@
 
 class AutomatedGuidedVehicle
 {
-    unsigned long _time = millis();
+    
 
     int _rotatingSpeed = 8;
     int _movingSpeed = 8;
@@ -25,7 +25,8 @@ class AutomatedGuidedVehicle
 
     int DetectDistance = 150;
     InternalMeasurementUnit IMU;
-
+    unsigned long Time;
+    String Name = "AGV";
 
 
     AutomatedGuidedVehicle() {}
@@ -42,36 +43,43 @@ class AutomatedGuidedVehicle
 
     void Stop()
     {
+        Serial.println("Vehicle.Stop..");
         _motor.Stop();
     }
 
     void Forward(int moveTime)
     {
+        Serial.println("Vehicle.Forward..");
         _motor.Rotate(_movingSpeed, moveTime);
     }
 
     void Backward(int moveTime)
     {
+        Serial.println("Vehicle.Backward..");
         _motor.Rotate(_movingSpeed, moveTime);
     }
 
     void TurnRight(int degree)
     {
+        Serial.println("Vehicle.TurnRight..");
         _stepper.Rotate(degree, _rotatingSpeed);
     }
 
     void TurnLeft(int degree)
     {
+        Serial.println("Vehicle.TurnLeft..");
         _stepper.Rotate(-degree, _rotatingSpeed);
     }
 
     void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
     {
+        Serial.println("Vehicle.InitializeStepper..");
         _stepper.Initialize(pin1, pin2, pin3, pin4);
     }
 
     void InitializeMotor(int RPWM, int LPWM)
     {
+        Serial.println("Vehicle.InitializeMotor..");
         _motor.Initialize(RPWM, LPWM);
     }
 
@@ -89,25 +97,17 @@ class AutomatedGuidedVehicle
 
     void Update()
     {
-
+        Time = millis();
         
-        IMU.Update();
+        //IMU.Update();
+        
         Sensors.Update();
+        
         _motor.Update();
         _stepper.Update();
         
 
-    }
-
-    void SetTime(unsigned long updateTime)
-    {
-        _time = updateTime;
-        Sensors.SetTime(_time);
-        _motor.SetTime(_time);
-        _stepper.SetTime(_time);
-    }
-
-    
+    } 
 };
 
 #endif // AutomatedGuidedVehicle_h

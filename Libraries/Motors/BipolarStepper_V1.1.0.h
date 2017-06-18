@@ -60,7 +60,9 @@ class BipolarStepper
 		//  White  (B-)    +  -  -  +
 		//
 		
-		
+	//   Serial.print("Stepper.State..");
+	//   Serial.println(state);
+	  delay(10);
       switch (state) 
 	  {
         case 1:  // Step 1
@@ -97,7 +99,6 @@ class BipolarStepper
           break;
       }
 	  _currentState = state;
-      delay(1);
     }
 
 	void rotateMotor()
@@ -280,6 +281,7 @@ class BipolarStepper
 			return;
 		}
 
+		delay(1);
 		if (_time % _speed == 0) // Speed how fast the motor is running
 		{
 			rotateMotor();

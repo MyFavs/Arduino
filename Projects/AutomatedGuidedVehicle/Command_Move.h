@@ -31,79 +31,7 @@ class Command_Move
 
         void Update()
         {
-            switch (state)
-            {
-                case 1: 
-                    if (vehicle.cmd_MoveForward.IsFinished())
-                    {
-                        
-                       Forward();
-                    }
-
-                    if (vehicle.cmd_MoveForward.IsFinished())
-                    {
-                        if (vehicle.Sensors.IsObjectDetected())
-                        {
-                            state = 2;
-                        }
-
-                        if (vehicle.Sensors.IsGroundDetected())
-                        {
-                            state = 3;
-                        }
-                    }
-
-                    break;
-                case 2:
-                    if (vehicle.cmd_Dodge.IsFinished())
-                    {
-                        Dodge();
-                    }
-
-                    if (vehicle.cmd_Dodge.IsFinished())
-                    {
-                        state = 1;
-                    }
-                    break;
-
-                case 3:
-                    if (vehicle.cmd_Rotate.IsFinished())
-                    {
-                        if (direction == -1)
-                        {
-                            RotateLeft();
-                        }
-                        else if (direction == 1)
-                        {
-                            RotateRight();
-                        }
-                    }
-
-                    if (vehicle.cmd_Rotate.IsFinished())
-                    {
-                        state = 4;
-                    }
-                    break;
-                case 4:
-                    if (vehicle.cmd_Rotate.IsFinished())
-                    {
-                        if (direction == -1)
-                        {
-                            RotateLeft();
-                        }
-                        else if (direction == 1)
-                        {
-                            RotateRight();
-                        }
-                    }
-
-                    if (vehicle.cmd_Rotate.IsFinished())
-                    {
-                        state = 1;
-                        direction = -direction;
-                    }
-                    break;
-            }
+            
             // vehicle.cmd_Rotate.Update();
             // vehicle.cmd_Dodge.Update();
             // vehicle.cmd_MoveForward1.Update();
@@ -115,25 +43,25 @@ class Command_Move
             direction = -1;
         }
 
-        void Forward()
-        {
-            vehicle.cmd_MoveForward.Start();
-        }
+        // void Forward()
+        // {
+        //     vehicle.cmd_MoveForward.Start();
+        // }
 
-        void RotateLeft()
-        {
-            vehicle.cmd_Rotate.Left();
-        }
+        // void RotateLeft()
+        // {
+        //     vehicle.cmd_Rotate.Left();
+        // }
 
-        void RotateRight()
-        {
-            vehicle.cmd_Rotate.Right();
-        }
+        // void RotateRight()
+        // {
+        //     vehicle.cmd_Rotate.Right();
+        // }
 
-        void Dodge()
-        {
-            vehicle.cmd_Dodge.Start();
-        }
+        // void Dodge()
+        // {
+        //     vehicle.cmd_Dodge.Start();
+        // }
 
         bool IsFinished()
         {

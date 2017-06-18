@@ -34,12 +34,18 @@ class InternalMeasurementUnit
 
     void recordAccelRegisters()
     {
-        Wire.beginTransmission(0b1101000);
+        
+        Wire.beginTransmission(0b1101000);    
         Wire.write(0x3B);
+        //Serial.println("IM OKAY");
         Wire.endTransmission();
+        //Serial.println("IM OKAY");
         Wire.requestFrom(0b1101000, 6);
+        //Serial.println("IM OKAY");
         while (Wire.available() < 6)
-            ;
+        {
+        //    Serial.println(Wire.available());
+        }
         accelX = Wire.read() << 8 | Wire.read();
         accelY = Wire.read() << 8 | Wire.read();
         accelZ = Wire.read() << 8 | Wire.read();
@@ -59,8 +65,7 @@ class InternalMeasurementUnit
         Wire.write(0x43);
         Wire.endTransmission();
         Wire.requestFrom(0b1101000, 6);
-        while (Wire.available() < 6)
-            ;
+        while (Wire.available() < 6);
         gyroX = Wire.read() << 8 | Wire.read();
         gyroY = Wire.read() << 8 | Wire.read();
         gyroZ = Wire.read() << 8 | Wire.read();
@@ -82,10 +87,14 @@ class InternalMeasurementUnit
 
     void Update()
     {
+        
         Time = millis();
+        
         if (Time % 100 == 0)
         {
+            
             recordAccelRegisters();
+            
             recordGyroRegisters(); 
             if (rotZ > 1 || rotZ < -1)
             {
@@ -101,6 +110,7 @@ class InternalMeasurementUnit
                 isLevel = false;
             }
         }
+        
     }
 
     float GetAccelerationZ()
