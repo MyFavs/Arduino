@@ -14,18 +14,18 @@ class Command_MoveForward
 
         Command_MoveForward(AutomatedGuidedVehicle *obj)
         {
-            Serial.println(obj->Name);
+            // Serial.println(obj->Name);
             vehicle = obj;
-            Serial.println(vehicle->Name);
+            // Serial.println(vehicle->Name);
         }
 
         void Update()
         {
             if (!(vehicle->IsMoving()) && move)
             {
-                Serial.print("Moving Forward..60000..  ");
-                Serial.println(vehicle->Name);
-                vehicle->Forward(1000);
+                // Serial.print("Moving Forward..60000..  ");
+                // Serial.println(vehicle->Name);
+                vehicle->Forward(30000);
             }
 
             if (vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected())
@@ -39,12 +39,24 @@ class Command_MoveForward
 
         void Start()
         {
+            if (vehicle->IsMoving())
+            {
+                Serial.println("MoveForward Rejected!!!");
+                return;
+            }
             move = true;
         }
 
         bool IsFinished()
         {
             return (!move);
+        }
+
+        void Stop()
+        {
+            Serial.print("Stopped!");
+            move = false;
+            vehicle->Stop();
         }
 };
 

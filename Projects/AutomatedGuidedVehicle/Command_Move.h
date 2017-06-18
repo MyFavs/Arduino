@@ -13,17 +13,17 @@ class Command_Move
     int direction = 0;
     int state = 0;
 
-    AutomatedGuidedVehicle vehicle;
-    // Command_MoveForward vehicle.cmd_MoveForward1;
-    // Command_Dodge vehicle.cmd_Dodge;
-    // Command_Rotate vehicle.cmd_Rotate;
+    AutomatedGuidedVehicle *vehicle;
+    // Command_MoveForward vehicle->cmd_MoveForward1;
+    // Command_Dodge vehicle->cmd_Dodge;
+    // Command_Rotate vehicle->cmd_Rotate;
 
     public:
 
         Command_Move() {}
 
 
-        Command_Move(AutomatedGuidedVehicle obj)
+        Command_Move(AutomatedGuidedVehicle *obj)
         {
             vehicle = obj;
 
@@ -32,9 +32,9 @@ class Command_Move
         void Update()
         {
             
-            // vehicle.cmd_Rotate.Update();
-            // vehicle.cmd_Dodge.Update();
-            // vehicle.cmd_MoveForward1.Update();
+            // vehicle->cmd_Rotate.Update();
+            // vehicle->cmd_Dodge.Update();
+            // vehicle->cmd_MoveForward1.Update();
         }
 
         void Start()
@@ -45,22 +45,22 @@ class Command_Move
 
         // void Forward()
         // {
-        //     vehicle.cmd_MoveForward.Start();
+        //     vehicle->cmd_MoveForward.Start();
         // }
 
         // void RotateLeft()
         // {
-        //     vehicle.cmd_Rotate.Left();
+        //     vehicle->cmd_Rotate.Left();
         // }
 
         // void RotateRight()
         // {
-        //     vehicle.cmd_Rotate.Right();
+        //     vehicle->cmd_Rotate.Right();
         // }
 
         // void Dodge()
         // {
-        //     vehicle.cmd_Dodge.Start();
+        //     vehicle->cmd_Dodge.Start();
         // }
 
         bool IsFinished()
@@ -68,7 +68,7 @@ class Command_Move
             return (state == 0);
         }
 
-        Initialize(AutomatedGuidedVehicle obj)
+        Initialize(AutomatedGuidedVehicle *obj)
         {
             vehicle = obj;
         }

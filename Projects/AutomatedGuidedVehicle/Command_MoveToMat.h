@@ -6,13 +6,13 @@
 class Command_MoveToMat
 {
     int state = 0;
-    AutomatedGuidedVehicle vehicle;
+    AutomatedGuidedVehicle *vehicle;
 
     public:
 
         Command_MoveToMat() {}
 
-        Command_MoveToMat(AutomatedGuidedVehicle obj)
+        Command_MoveToMat(AutomatedGuidedVehicle *obj)
         {
             vehicle = obj;
         }
@@ -22,22 +22,22 @@ class Command_MoveToMat
             if (state == 0)
                 return;
 
-            if (vehicle.Time % 100 != 0)
+            if (vehicle->Time % 100 != 0)
                 return;
                 
             switch(state)
             {
                 case 1:
-                    if (!vehicle.IsMoving())
-                        vehicle.Forward(60000);
+                    if (!vehicle->IsMoving())
+                        vehicle->Forward(60000);
 
-                    if (vehicle.Sensors.IsGroundDetected())
+                    if (vehicle->Sensors.IsGroundDetected())
                         state++;
                     break;
                 case 2:
-                    if (vehicle.IMU.IsLevel())
+                    if (vehicle->IMU.IsLevel())
                     {
-                        vehicle.Stop();
+                        vehicle->Stop();
                         state = 0;
                     }
                     break;

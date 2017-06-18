@@ -7,13 +7,13 @@ class Command_Rotate
 {
     int state = 0;
     int direction = 0;
-    AutomatedGuidedVehicle vehicle;
+    AutomatedGuidedVehicle *vehicle;
 
     public:
 
         Command_Rotate() {}
 
-        Command_Rotate(AutomatedGuidedVehicle obj)
+        Command_Rotate(AutomatedGuidedVehicle *obj)
         {   
             vehicle = obj;
         }
@@ -22,64 +22,64 @@ class Command_Rotate
             switch(state)
             {
                 case 1:     // 1) Achteruit 
-                    if (!vehicle.IsMoving())
+                    if (!vehicle->IsMoving())
                     {
-                        vehicle.Backward(1000);
+                        vehicle->Backward(1000);
                     }
 
-                    if (!vehicle.IsMoving())
+                    if (!vehicle->IsMoving())
                     {
                         state++;
                     }
                     break;
 
                 case 2:     // 2) draai links/rechts 90 graden
-                    if (!vehicle.IsTurning())
+                    if (!vehicle->IsTurning())
                     {
                         switch(direction)
                         {
                             case -1:
-                                vehicle.TurnLeft(90);
+                                vehicle->TurnLeft(90);
                                 break;
                             case 1:
-                                vehicle.TurnRight(90);
+                                vehicle->TurnRight(90);
                                 break;
                         }
                     }
 
-                    if (!vehicle.IsTurning())
+                    if (!vehicle->IsTurning())
                     {
                         state++;
                     }
                     break;
                 case 3:     // 3) vooruit tot 90 graden gedraaid AGV (controle IMU) & controle einde mat
-                    if (!vehicle.IsMoving())
+                    if (!vehicle->IsMoving())
                     {
-                        vehicle.Forward(60000);
-                        vehicle.IMU.ResetZ();
+                        vehicle->Forward(60000);
+                        vehicle->IMU.ResetZ();
                     }
-                    if (vehicle.IMU.GetTotalRotationZ() >= 90 || vehicle.IMU.GetTotalRotationZ() <= -90)
+                    if (vehicle->IMU.GetTotalRotationZ() >= 90 || vehicle->IMU.GetTotalRotationZ() <= -90)
                     {
-                        vehicle.IMU.ResetZ();
-                        vehicle.Stop();
+                        vehicle->IMU.ResetZ();
+                        vehicle->Stop();
                         state++;
                     }
                     break;
                 case 4:     // 4) draai links/rechts 90 graden terug
-                    if (!vehicle.IsTurning())
+                    if (!vehicle->IsTurning())
                     {
                         switch(direction)
                         {
                             case -1:
-                                vehicle.TurnRight(90);
+                                vehicle->TurnRight(90);
                                 break;
                             case 1:
-                                vehicle.TurnLeft(90);
+                                vehicle->TurnLeft(90);
                                 break;
                         }
                     }
 
-                    if (!vehicle.IsTurning())
+                    if (!vehicle->IsTurning())
                     {
                         state = 0;
                     }

@@ -124,10 +124,10 @@ class MotorDC
 
 	void Update()
 	{
-		Serial.print("Motor._rotationTime:");
-		Serial.print(_rotationTime);
-		Serial.print("  _time:");
-		Serial.println(millis());
+		// Serial.print("Motor._rotationTime:");
+		// Serial.print(_rotationTime);
+		// Serial.print("  _time:");
+		// Serial.println(millis());
 		if (_rotationTime > 0)
 		{
 			if (millis() > _time + _rotationTime)

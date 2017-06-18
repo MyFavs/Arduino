@@ -9,11 +9,11 @@
 
 AutomatedGuidedVehicle vehicle;
 
-Command_Dodge cmd_Dodge(vehicle);
-Command_MoveToMat cmd_MoveToMat(vehicle);
-Command_Rotate cmd_Rotate(vehicle);
+Command_Dodge cmd_Dodge(&vehicle);
+Command_MoveToMat cmd_MoveToMat(&vehicle);
+Command_Rotate cmd_Rotate(&vehicle);
 Command_MoveForward cmd_MoveForward(&vehicle);
-Command_Move cmd_Move(vehicle);
+Command_Move cmd_Move(&vehicle);
 
 IRrecv irrecv(12);
 
@@ -42,8 +42,6 @@ void setup()
   vehicle.Sensors.InitializeRemoteControlPin(12);
   pinMode(13, OUTPUT);
   Serial.begin(9600);
-  Code = 16753245;
-  Command = "CH-";
 }
 
 void loop()
@@ -55,17 +53,24 @@ void loop()
     if (Code > 0)
     {
       Serial.println(Code);
-      if (Command == "CH-")
+      if (Command == "1")
       {
-        vehicle.Name = "Tom";
-        Serial.println(vehicle.Name);
         cmd_MoveForward.Start();
         //vehicle.Forward(1000);
         //vehicle.TurnLeft(90);
       }
+      if (Command == "2")
+      {
+        cmd_Rotate.Left();
+      }
+      if (Command == "3")
+      {
+        cmd_Dodge.Start();
+      }
       else
       {
         vehicle.Stop();
+        cmd_MoveForward.Stop();
       }
     }
     Code = 0;
