@@ -6,32 +6,34 @@
 class Command_MoveForward
 {
     bool move = false;
-    AutomatedGuidedVehicle vehicle;
+    AutomatedGuidedVehicle *vehicle;
 
     public:
 
         Command_MoveForward() {}
 
-        Initialize(AutomatedGuidedVehicle* obj)
+        Command_MoveForward(AutomatedGuidedVehicle *obj)
         {
-            vehicle = *obj;
+            Serial.println(obj->Name);
+            vehicle = obj;
+            Serial.println(vehicle->Name);
         }
 
         void Update()
         {
-            if (!(vehicle.IsMoving()) && move)
+            if (!(vehicle->IsMoving()) && move)
             {
                 Serial.print("Moving Forward..60000..  ");
-                Serial.println(vehicle.Name);
-                vehicle.Forward(1000);
+                Serial.println(vehicle->Name);
+                vehicle->Forward(1000);
             }
 
-            if (vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected())
+            if (vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected())
             {
                 Serial.print("Sensors detected!");
                 //Serial.println(vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected());
                 move = false;
-                vehicle.Stop();
+                vehicle->Stop();
             }
         }
 

@@ -12,7 +12,7 @@ AutomatedGuidedVehicle vehicle;
 Command_Dodge cmd_Dodge(vehicle);
 Command_MoveToMat cmd_MoveToMat(vehicle);
 Command_Rotate cmd_Rotate(vehicle);
-Command_MoveForward cmd_MoveForward;
+Command_MoveForward cmd_MoveForward(&vehicle);
 Command_Move cmd_Move(vehicle);
 
 IRrecv irrecv(12);
@@ -34,7 +34,6 @@ void CarMP3_Remote();
 
 void setup()
 {
-  cmd_MoveForward.Initialize(&vehicle);
   irrecv.enableIRIn(); // Start the receiver
   vehicle.InitializeStepper(8, 9, 10, 11);
   vehicle.InitializeMotor(6, 7);
@@ -59,6 +58,7 @@ void loop()
       if (Command == "CH-")
       {
         vehicle.Name = "Tom";
+        Serial.println(vehicle.Name);
         cmd_MoveForward.Start();
         //vehicle.Forward(1000);
         //vehicle.TurnLeft(90);
