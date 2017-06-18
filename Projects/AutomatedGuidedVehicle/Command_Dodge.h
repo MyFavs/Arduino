@@ -145,9 +145,20 @@ class Command_Dodge
 
     void Start()
     {
+        if (vehicle->IsMoving())
+            {
+                Serial.println("Dodge Rejected!!!");
+                return;
+            }
         if (IsFinished()) 
             state = 1;
     }
+
+    void Stop()
+        {
+            state = 0;
+            vehicle->Stop();
+        }
 };
 
 #endif // Command_Dodge_h

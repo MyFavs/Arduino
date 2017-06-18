@@ -46,8 +46,17 @@ void setup()
 
 void loop()
 {
-    
+  vehicle.Time = millis();
   // --------------AFSTANDSBEDIENING UITVRAGEN---------------
+
+  if (Command == "4" && Code > 0)
+      {
+        vehicle.Stop();
+        cmd_MoveForward.Stop();
+        cmd_Rotate.Stop();
+        cmd_Dodge.Stop();
+      }
+  
   if (!isExecutingCommand())
   {
     if (Code > 0)
@@ -59,18 +68,13 @@ void loop()
         //vehicle.Forward(1000);
         //vehicle.TurnLeft(90);
       }
-      if (Command == "2")
+      else if (Command == "2")
       {
         cmd_Rotate.Left();
       }
-      if (Command == "3")
+      else if (Command == "3")
       {
         cmd_Dodge.Start();
-      }
-      else
-      {
-        vehicle.Stop();
-        cmd_MoveForward.Stop();
       }
     }
     Code = 0;
@@ -88,12 +92,12 @@ void loop()
 
   if (Command != ""){Serial.println(Command);}
   processUpdate();
-  vehicle.Update();
+  vehicle.Sensors.Update();
   MoveUpdate();
   cmd_Dodge.Update();
   cmd_MoveForward.Update();
-  cmd_Move.Update();
   cmd_Rotate.Update();
+  vehicle.Update();
 
 }
 

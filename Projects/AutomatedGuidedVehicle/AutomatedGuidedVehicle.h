@@ -97,11 +97,11 @@ class AutomatedGuidedVehicle
 
     void Update()
     {
-        Time = millis();
+        //Time = millis();
         
         //IMU.Update();
         
-        Sensors.Update();
+        //Sensors.Update();
         
         _motor.Update();
         _stepper.Update();
