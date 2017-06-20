@@ -5,12 +5,10 @@
 #include <BipolarStepper_V1.1.0.h>
 #include <MotorDC_V2.0.0.h>
 #include "Sensors.h"
-//#include <IMU_V1.0.0.h>
-
+#include "IMU.h"
 
 class AutomatedGuidedVehicle
 {
-    
 
     int _rotatingSpeed = 8;
     int _movingSpeed = 8;
@@ -18,18 +16,17 @@ class AutomatedGuidedVehicle
     BipolarStepper _stepper;
     MotorDC _motor;
 
-
-
   public:
     // Constructor
 
     int DetectDistance = 150;
-    //InternalMeasurementUnit IMU;
+    InternalMeasurementUnit IMU;
     unsigned long Time;
     String Name = "AGV";
 
-
-    AutomatedGuidedVehicle() {}
+    AutomatedGuidedVehicle()
+    {
+    }
 
     // -------------------------------------------------
     // -- Properties
@@ -93,21 +90,15 @@ class AutomatedGuidedVehicle
         return (_stepper.IsRotating() != 0);
     }
 
-    
-
     void Update()
     {
         //Time = millis();
-        
-        //IMU.Update();
-        
-        //Sensors.Update();
-        
-        _motor.Update();
-        _stepper.Update();
+
         
 
-    } 
+        _motor.Update();
+        _stepper.Update();
+    }
 };
 
 #endif // AutomatedGuidedVehicle_h

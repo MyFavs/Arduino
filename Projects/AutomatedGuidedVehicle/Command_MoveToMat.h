@@ -35,11 +35,11 @@ class Command_MoveToMat
                         state++;
                     break;
                 case 2:
-//                    if (vehicle->IMU.IsLevel())
-//                    {
-//                        vehicle->Stop();
-//                        state = 0;
-//                    }
+                   if (vehicle->IMU.IsLevel())
+                   {
+                       vehicle->Stop();
+                       state = 0;
+                   }
                     break;
             }
         }

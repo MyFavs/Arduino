@@ -47,7 +47,11 @@ class Ultrasoon
 		delayMicroseconds(10);
 		digitalWrite(trigPin, LOW);
 		
-		duration = pulseIn(echoPin, HIGH);
+		duration = pulseIn(echoPin, HIGH, 100);
+		if (duration == 0)
+		{
+			return 0;
+		}
 		distance = (duration/2) * c * 10;
 		return distance;
 	}

@@ -21,8 +21,8 @@ class Command_MoveForward
 
         void Update()
         {
-            Serial.print("IsGroundDetected: ");
-            Serial.println(vehicle->Sensors.IsGroundDetected());
+//            Serial.print("IsGroundDetected: ");
+//            Serial.println(vehicle->Sensors.IsGroundDetected());
             if (!(vehicle->IsMoving()) && move)
             {
                 // Serial.print("Moving Forward..60000..  ");
