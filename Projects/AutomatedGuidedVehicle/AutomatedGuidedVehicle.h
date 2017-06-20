@@ -5,7 +5,7 @@
 #include <BipolarStepper_V1.1.0.h>
 #include <MotorDC_V2.0.0.h>
 #include "Sensors.h"
-#include <IMU_V1.0.0.h>
+//#include <IMU_V1.0.0.h>
 
 
 class AutomatedGuidedVehicle
@@ -24,7 +24,7 @@ class AutomatedGuidedVehicle
     // Constructor
 
     int DetectDistance = 150;
-    InternalMeasurementUnit IMU;
+    //InternalMeasurementUnit IMU;
     unsigned long Time;
     String Name = "AGV";
 

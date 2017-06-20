@@ -21,6 +21,8 @@ class Command_MoveForward
 
         void Update()
         {
+            Serial.print("IsGroundDetected: ");
+            Serial.println(vehicle->Sensors.IsGroundDetected());
             if (!(vehicle->IsMoving()) && move)
             {
                 // Serial.print("Moving Forward..60000..  ");
@@ -28,7 +30,7 @@ class Command_MoveForward
                 vehicle->Forward(30000);
             }
 
-            if (vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected())
+            if ((vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected()) && move)
             {
                 Serial.print("Sensors detected!");
                 //Serial.println(vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected());

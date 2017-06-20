@@ -34,6 +34,7 @@ void CarMP3_Remote();
 
 void setup()
 {
+
   irrecv.enableIRIn(); // Start the receiver
   vehicle.InitializeStepper(8, 9, 10, 11);
   vehicle.InitializeMotor(6, 7);
@@ -42,21 +43,25 @@ void setup()
   vehicle.Sensors.InitializeRemoteControlPin(12);
   pinMode(13, OUTPUT);
   Serial.begin(9600);
+  Serial.println("IM OKAY Setup");
+  Code = 1;
+  Command = "1";
 }
 
 void loop()
 {
+      //Serial.println("IM OKAY Loop");
   vehicle.Time = millis();
   // --------------AFSTANDSBEDIENING UITVRAGEN---------------
 
   if (Command == "4" && Code > 0)
-      {
-        vehicle.Stop();
-        cmd_MoveForward.Stop();
-        cmd_Rotate.Stop();
-        cmd_Dodge.Stop();
-      }
-  
+  {
+    vehicle.Stop();
+    cmd_MoveForward.Stop();
+    cmd_Rotate.Stop();
+    cmd_Dodge.Stop();
+  }
+
   if (!isExecutingCommand())
   {
     if (Code > 0)
@@ -90,7 +95,9 @@ void loop()
     irrecv.resume(); // Receive the next value
   }
 
-  if (Command != ""){Serial.println(Command);}
+  if (Command != "") {
+    Serial.println(Command);
+  }
   processUpdate();
   vehicle.Sensors.Update();
   MoveUpdate();
@@ -347,8 +354,8 @@ void CarMP3_Remote()
 
   if (Command == "")
   {
-      Code = 0;
-      Command = "";
+    Code = 0;
+    Command = "";
   }
 }
 

@@ -80,7 +80,7 @@ class InternalMeasurementUnit
     }
 
   public:
-    IMU()
+    InternalMeasurementUnit()
     {
         setupMPU();
     }

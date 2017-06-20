@@ -64,14 +64,14 @@ class Command_Rotate
                     if (!vehicle->IsMoving())
                     {
                         vehicle->Forward(30000);
-                        vehicle->IMU.ResetZ();
+                        //vehicle->IMU.ResetZ();
                     }
-                    if (vehicle->IMU.GetTotalRotationZ() >= 90 || vehicle->IMU.GetTotalRotationZ() <= -90)
-                    {
-                        vehicle->IMU.ResetZ();
-                        vehicle->Stop();
-                        state++;
-                    }
+//                    if (vehicle->IMU.GetTotalRotationZ() >= 90 || vehicle->IMU.GetTotalRotationZ() <= -90)
+//                    {
+//                        vehicle->IMU.ResetZ();
+//                        vehicle->Stop();
+//                        state++;
+//                    }
                     break;
                 case 4:     // 4) draai links/rechts 90 graden terug
                     if (!vehicle->IsTurning())

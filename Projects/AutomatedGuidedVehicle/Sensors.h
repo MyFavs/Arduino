@@ -37,8 +37,8 @@ class InternalSensors
 
     void InitializeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
     {
-        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);    //ERROR
-        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin); //ERROR
+        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);    
+        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin); 
     }
 
     void InitializeDetectorPins(int pinLeft, int pinRight)
@@ -61,7 +61,15 @@ class InternalSensors
         _scanState = 0;
         int scannedLeft = _ultrasoonLeft.Scan();
         int scannedRight = _ultrasoonRight.Scan();
+        Serial.print("distanceLeft: ");
+        Serial.print(scannedLeft);
+        Serial.print("  DistanceRight: ");
+        Serial.println(scannedRight);
 
+        Serial.print("detectorLeft: ");
+        Serial.print(digitalRead(_detectorLeft));
+        Serial.print("  detectorRight: ");
+        Serial.println(digitalRead(_detectorRight));
         if (scannedLeft < 300 && scannedLeft > 100)
         {
             _scanState += 1;
@@ -81,6 +89,8 @@ class InternalSensors
         {
             _scanState += 8;
         }
+        Serial.print("ScanState = ");
+        Serial.println(_scanState);
     }
 
     int GetScanState()
@@ -100,7 +110,7 @@ class InternalSensors
 
     bool IsGroundDetected()
     {
-        return (IsGroundDetectedLeft() && IsGroundDetectedRight());
+        return (IsGroundDetectedLeft() || IsGroundDetectedRight());
     }
 
     bool IsObjectDetectedLeft()
