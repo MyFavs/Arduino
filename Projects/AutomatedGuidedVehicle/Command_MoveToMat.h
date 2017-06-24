@@ -7,6 +7,7 @@ class Command_MoveToMat
 {
     int state = 0;
     AutomatedGuidedVehicle *vehicle;
+    bool yes = false;
 
     public:
 
@@ -28,17 +29,26 @@ class Command_MoveToMat
             switch(state)
             {
                 case 1:
-                    if (!vehicle->IsMoving())
-                        vehicle->Forward(60000);
+                    if (!vehicle->IsMoving() && !yes)
+                        vehicle->Forward(30000);
+                        yes = true;
 
-                    if (vehicle->Sensors.IsGroundDetected())
+                    if (!vehicle->Sensors.IsGroundDetected())
                         state++;
+                        vehicle->Stop();
+                        yes = false;
                     break;
                 case 2:
-                   if (vehicle->IMU.IsLevel())
+                   if (!vehicle->IsMoving() && !yes)
                    {
-                       vehicle->Stop();
+                       vehicle->Forward(1000);
+                       yes = true;
+                   }
+
+                   if (!vehicle->IsMoving())
+                   {
                        state = 0;
+                       yes = false;
                    }
                     break;
             }
@@ -51,7 +61,7 @@ class Command_MoveToMat
 
         void Start()
         {
-            if (!IsFinished()) 
+            if (IsFinished()) 
                 state = 1;
         }
 };

@@ -52,6 +52,9 @@ class InternalSensors
         // int scannedLeft = 0;
         // int scannedRight = 0;
 
+//        Serial.print(scannedLeft);
+//        Serial.print("                ");
+//        Serial.println(scannedRight);
 
         if (scannedLeft < 300 && scannedLeft > 100)
         {

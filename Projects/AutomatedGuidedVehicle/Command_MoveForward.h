@@ -30,10 +30,10 @@ class Command_MoveForward
                 vehicle->Forward(30000);
             }
 
-            if ((vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected()) && move)
+            if (vehicle->Sensors.IsGroundDetected() /*|| vehicle->Sensors.IsObjectDetected())*/ && move)
             {
                 Serial.print("Sensors detected!");
-                //Serial.println(vehicle.Sensors.IsGroundDetected() || vehicle.Sensors.IsObjectDetected());
+                //Serial.println(vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected());
                 move = false;
                 vehicle->Stop();
             }

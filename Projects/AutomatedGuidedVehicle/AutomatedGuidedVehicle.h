@@ -44,6 +44,14 @@ class AutomatedGuidedVehicle
         _motor.Stop();
     }
 
+    void Forward(int moveTime, int moveSpeed)
+    {
+        Serial.print("Vehicle.Forward..  ");
+        Serial.print("At speed: ");
+        Serial.println(moveSpeed);
+        _motor.Rotate(moveSpeed, moveTime);
+    }
+
     void Forward(int moveTime)
     {
         Serial.println("Vehicle.Forward..");
@@ -53,7 +61,7 @@ class AutomatedGuidedVehicle
     void Backward(int moveTime)
     {
         Serial.println("Vehicle.Backward..");
-        _motor.Rotate(_movingSpeed, moveTime);
+        _motor.Rotate(-_movingSpeed, moveTime);
     }
 
     void TurnRight(int degree)

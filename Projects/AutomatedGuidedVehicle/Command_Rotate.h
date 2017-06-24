@@ -61,20 +61,24 @@ class Command_Rotate
                     }
                     break;
                 case 3:     // 3) vooruit tot 90 graden gedraaid AGV (controle IMU) & controle einde mat
-                    if (!vehicle->IsMoving())
+                    if (!vehicle->IsMoving() && !yes)
                     {
-                        vehicle->Forward(30000);
+                      Serial.println("MOVING INDEFINITELY ROTATE");
+                        vehicle->Forward(30000, 3);
                         vehicle->IMU.ResetZ();
+                        yes = true;
                     }
-                   if (vehicle->IMU.TotalRotationZ >= 90 || vehicle->IMU.TotalRotationZ <= -90)
+                   if (vehicle->IMU.TotalRotationZ >= 85 || vehicle->IMU.TotalRotationZ <= -85)
                    {
+                       Serial.println("STOPPED ROTATING");
                        vehicle->IMU.ResetZ();
                        vehicle->Stop();
                        state++;
+                       yes = false;
                    }
                     break;
                 case 4:     // 4) draai links/rechts 90 graden terug
-                    if (!vehicle->IsTurning())
+                    if (!vehicle->IsTurning() && !yes)
                     {
                         switch(direction)
                         {
@@ -85,11 +89,13 @@ class Command_Rotate
                                 vehicle->TurnLeft(70);
                                 break;
                         }
+                        yes = true;
                     }
 
                     if (!vehicle->IsTurning())
                     {
                         state = 0;
+                        yes = false;
                     }
                     break;
             }

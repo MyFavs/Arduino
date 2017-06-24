@@ -40,10 +40,19 @@ void setup()
   vehicle.Sensors.InitializeUltrasonicPins(2, 4, 3, 5);
   vehicle.Sensors.InitializeDetectorPins(40, 41);
   pinMode(13, OUTPUT);
+  pinMode(22, OUTPUT);
+  pinMode(24, OUTPUT);
+  pinMode(26, OUTPUT);
+  pinMode(28, OUTPUT);
+
+  digitalWrite(22, HIGH);
+  digitalWrite(24, HIGH);
+  digitalWrite(26, HIGH);
+  digitalWrite(28, HIGH);
   Serial.begin(9600);
   Serial.println("IM OKAY Setup");
-//  Code = 1;
-//  Command = "1";
+  Code = 1;
+  Command = "1";
 }
 
 void loop()
@@ -51,7 +60,7 @@ void loop()
   //Serial.println("IM OKAY Loop");
   vehicle.Time = millis();
   vehicle.Sensors.Time = vehicle.Time;
-  Serial.println(vehicle.Time);
+  //Serial.println(vehicle.Time);
   // --------------AFSTANDSBEDIENING UITVRAGEN---------------
 
   if (Command == "4" && Code > 0)
@@ -69,17 +78,21 @@ void loop()
       Serial.println(Code);
       if (Command == "1")
       {
-        cmd_MoveForward.Start();
-        //vehicle.Forward(1000);
+        //cmd_MoveForward.Start();
+        vehicle.Forward(2000);
         //vehicle.TurnLeft(90);
       }
       else if (Command == "2")
       {
-        cmd_Rotate.Left();
+        cmd_Rotate.Right();
       }
       else if (Command == "3")
       {
         cmd_Dodge.Start();
+      }
+      else if (Command == "5")
+      {
+          start();
       }
     }
     Code = 0;
@@ -123,6 +136,8 @@ bool isExecutingCommand()
   return false;
 }
 
+bool yes = false;
+
 void start()
 {
   _processing = true;
@@ -134,60 +149,75 @@ void processUpdate()
   switch (state)
   {
   case 1:
-    if (cmd_MoveToMat.IsFinished())
+    if (cmd_MoveToMat.IsFinished() && !yes)
     {
-      delay(1000);
+      //delay(1000);
       cmd_MoveToMat.Start();
+      yes = true;
+      Serial.println("STATE 1");
     }
 
     if (cmd_MoveToMat.IsFinished())
     {
       state++;
+      yes = false;
     }
     cmd_MoveToMat.Update();
     break;
   case 2:
-    if (cmd_Rotate.IsFinished())
+    if (cmd_Rotate.IsFinished() && !yes)
     {
       cmd_Rotate.Right();
+      yes = true;
+      Serial.println("STATE 2");
     }
 
     if (cmd_Rotate.IsFinished())
     {
       state++;
+      yes = false;
     }
     break;
   case 3:
-    if (cmd_MoveForward.IsFinished())
+    if (cmd_MoveForward.IsFinished() && !yes)
     {
       cmd_MoveForward.Start();
+      yes = true;
+      Serial.println("STATE 3");
     }
     if (cmd_MoveForward.IsFinished())
     {
       state++;
+      yes = false;
     }
     break;
   case 4:
-    if (cmd_Rotate.IsFinished())
+    if (cmd_Rotate.IsFinished() && !yes)
     {
       cmd_Rotate.Left();
+      yes = true;
+      Serial.println("STATE 4");
     }
 
     if (cmd_Rotate.IsFinished())
     {
       state++;
+      yes = false;
     }
     break;
   case 5:
-    if (MoveIsFinished())
+    if (MoveIsFinished() && !yes)
     {
       MoveStart();
+      yes = true;
+      Serial.println("STATE 5");
     }
 
     if (MoveIsFinished())
     {
       state = 0;
       _processing = false;
+      yes = false;
     }
     break;
   }
@@ -204,14 +234,17 @@ bool MoveIsFinished()
   return (moveState == 0);
 }
 
+bool jo = false;
+
 void MoveUpdate()
 {
   switch (moveState)
   {
   case 1:
-    if (cmd_MoveForward.IsFinished())
+    if (cmd_MoveForward.IsFinished() && !jo)
     {
       cmd_MoveForward.Start();
+      jo = true;
     }
 
     if (cmd_MoveForward.IsFinished())
@@ -225,23 +258,26 @@ void MoveUpdate()
       {
         moveState = 3;
       }
+      jo = false;
     }
 
     break;
   case 2:
-    if (cmd_Dodge.IsFinished())
+    if (cmd_Dodge.IsFinished() && !jo)
     {
       cmd_Dodge.Start();
+      jo = true;
     }
 
     if (cmd_Dodge.IsFinished())
     {
       moveState = 1;
+      jo = false;
     }
     break;
 
   case 3:
-    if (cmd_Rotate.IsFinished())
+    if (cmd_Rotate.IsFinished() && !jo)
     {
       if (moveDirection == -1)
       {
@@ -251,15 +287,17 @@ void MoveUpdate()
       {
         cmd_Rotate.Right();
       }
+      jo = true;
     }
 
     if (cmd_Rotate.IsFinished())
     {
       moveState = 4;
+      jo = false;
     }
     break;
   case 4:
-    if (cmd_Rotate.IsFinished())
+    if (cmd_Rotate.IsFinished() && !jo)
     {
       if (moveDirection == -1)
       {
@@ -269,12 +307,14 @@ void MoveUpdate()
       {
         cmd_Rotate.Right();
       }
+      jo = true;
     }
 
     if (cmd_Rotate.IsFinished())
     {
       moveState = 1;
       moveDirection = -moveDirection;
+      jo = false;
     }
     break;
   }
@@ -442,6 +482,8 @@ void IMU_Update()
       vehicle.IMU.TotalRotationZ = vehicle.IMU.TotalRotationZ + vehicle.IMU.rotZ / 10;
     }
 //    Serial.print("TotalRotationZ: ");
-//    Serial.println(vehicle.IMU.TotalRotationZ);
+//    Serial.print(vehicle.IMU.TotalRotationZ);
+//    Serial.print("        GforceZ: ");
+//    Serial.println(vehicle.IMU.gForceZ);
   }
 }
