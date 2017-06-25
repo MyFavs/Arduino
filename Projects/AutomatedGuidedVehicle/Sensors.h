@@ -17,11 +17,16 @@ class InternalSensors
   public:
     InternalSensors() {}
 
+    bool Enabled = true;
+
     int ULTRASONIC_LEFT = 1;
     int ULTRASONIC_RIGHT = 2;
 
     int DETECTOR_LEFT = 4;
     int DETECTOR_RIGHT = 8;
+
+    int UltrasonicDistance1 = 0;
+    int UltrasonicDistance2 = 0;
 
     unsigned long Time;
     
@@ -41,6 +46,9 @@ class InternalSensors
 
     void Update()
     {
+        if (!Enabled)
+          return;
+      
         if (Time % 100 != 0)
         {
             return;
@@ -49,6 +57,10 @@ class InternalSensors
         _scanState = 0;
         int scannedLeft = _ultrasoonLeft.Scan();
         int scannedRight = _ultrasoonRight.Scan();
+
+        UltrasonicDistance1 = scannedLeft;
+        UltrasonicDistance2 = scannedRight;
+        
         // int scannedLeft = 0;
         // int scannedRight = 0;
 

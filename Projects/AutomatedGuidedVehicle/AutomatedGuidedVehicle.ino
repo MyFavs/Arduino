@@ -6,6 +6,7 @@
 #include "Command_Rotate.h"
 #include "Sensors.h"
 #include <IRremote.h>
+#include "RemoteControls.h"
 #include <Wire.h>
 
 AutomatedGuidedVehicle vehicle;
@@ -16,43 +17,40 @@ Command_Rotate cmd_Rotate(&vehicle);
 Command_MoveForward cmd_MoveForward(&vehicle);
 Command_Move cmd_Move(&vehicle);
 
+RemoteControls _remotes;
+
 IRrecv irrecv(12);
 
 decode_results results;
 
 int state = 0;
 bool _processing = false;
+bool _showSensorLog = false;
 
 int moveState = 0;
 int moveDirection = 0;
 
-String Command = "";
-long Code = 0;
-
-void CarMP3_Remote();
 
 void setup()
 {
+  Serial.begin(9600);
   IMU_Initialize();
   irrecv.enableIRIn(); // Start the receiver
   vehicle.InitializeStepper(8, 9, 10, 11);
   vehicle.InitializeMotor(6, 7);
-  vehicle.Sensors.InitializeUltrasonicPins(2, 4, 3, 5);
+  vehicle.Sensors.InitializeUltrasonicPins(2, 4, 3, 5);  // Trig1, Echo1, Trig2, Echo2
   vehicle.Sensors.InitializeDetectorPins(40, 41);
   pinMode(13, OUTPUT);
   pinMode(22, OUTPUT);
-  pinMode(24, OUTPUT);
-  pinMode(26, OUTPUT);
-  pinMode(28, OUTPUT);
 
-  digitalWrite(22, HIGH);
-  digitalWrite(24, HIGH);
-  digitalWrite(26, HIGH);
-  digitalWrite(28, HIGH);
-  Serial.begin(9600);
-  Serial.println("IM OKAY Setup");
-  Code = 1;
-  Command = "1";
+
+  digitalWrite(13,HIGH);  // Needed for IR Remote
+  digitalWrite(22, HIGH); // Needed as Power for the MotorController
+
+  Serial.println("Waiting for command...");
+
+  //_remotes.UseTypeCarMp3();
+  _remotes.UseTypeHumax();
 }
 
 void loop()
@@ -62,55 +60,88 @@ void loop()
   vehicle.Sensors.Time = vehicle.Time;
   //Serial.println(vehicle.Time);
   // --------------AFSTANDSBEDIENING UITVRAGEN---------------
-
-  if (Command == "4" && Code > 0)
+  
+  if (irrecv.decode(&results))
   {
-    vehicle.Stop();
-    cmd_MoveForward.Stop();
-    cmd_Rotate.Stop();
-    cmd_Dodge.Stop();
+    //Serial.println(results.value);
+    _remotes.SetCode(results.value);
+    irrecv.resume(); // Receive the next value
   }
 
-  if (!isExecutingCommand())
+  if (_remotes.HasCode())
   {
-    if (Code > 0)
+    if (_remotes.IsCommand("4","POWER"))
     {
-      Serial.println(Code);
-      if (Command == "1")
+      vehicle.Stop();
+      cmd_MoveForward.Stop();
+      cmd_Rotate.Stop();
+      cmd_Dodge.Stop();
+    }
+    if (_remotes.IsCommand("EQ","INFO"))
+    {
+      _showSensorLog = !_showSensorLog;
+      Serial.print("# Sensor Log ");
+      Serial.println(_showSensorLog);
+    }
+
+
+    if (!isExecutingCommand())
+    {
+      if (_remotes.IsCommand("1"))
       {
         //cmd_MoveForward.Start();
         vehicle.Forward(2000);
         //vehicle.TurnLeft(90);
       }
-      else if (Command == "2")
+      else if (_remotes.IsCommand("2"))
       {
         cmd_Rotate.Right();
       }
-      else if (Command == "3")
+      else if (_remotes.IsCommand("3"))
       {
         cmd_Dodge.Start();
       }
-      else if (Command == "5")
+      else if (_remotes.IsCommand("VOL-","LEFT"))
+      {
+        vehicle.TurnLeft(180,6);
+      }
+      else if (_remotes.IsCommand("VOL+","RIGHT"))
+      {
+        vehicle.TurnRight(180,8);
+      }
+      else if (_remotes.IsCommand("NEXT","UP"))
+      {
+        vehicle.Forward(2000);
+      }
+      else if (_remotes.IsCommand("PREV","DOWN"))
+      {
+        vehicle.Backward(2000);
+      }
+
+      else if (_remotes.IsCommand("CH+"))
+      {
+        vehicle.Sensors.Enabled = false;
+        vehicle.Step(100,4);
+      }
+      else if (_remotes.IsCommand("CH-"))
+      {
+        vehicle.Sensors.Enabled = false;
+         vehicle.Step(100,-4);
+      }
+
+  
+      
+      else if (_remotes.IsCommand("5"))
       {
           start();
       }
+      _remotes.Reset();
     }
-    Code = 0;
-    Command = "";
   }
 
-  if (irrecv.decode(&results))
-  {
-    //Serial.println(results.value);
-    Code = results.value;
-    CarMP3_Remote();
-    irrecv.resume(); // Receive the next value
-  }
 
-  if (Command != "")
-  {
-    Serial.println(Command);
-  }
+
+
   processUpdate();
   IMU_Update();
   vehicle.Sensors.Update();
@@ -119,6 +150,9 @@ void loop()
   cmd_MoveForward.Update();
   cmd_Rotate.Update();
   vehicle.Update();
+
+
+  
 }
 
 bool isExecutingCommand()
@@ -320,90 +354,8 @@ void MoveUpdate()
   }
 }
 
-void CarMP3_Remote()
-{
-  switch (Code)
-  {
-  case 16753245:
-    Command = "CH-";
-    break;
-  case 16736925:
-    Command = "CH";
-    break;
-  case 16769565:
-    Command = "CH+";
-    break;
-  case 16720605:
-    Command = "PREV";
-    break;
-  case 16712445:
-    Command = "NXT";
-    break;
-  case 16761405:
-    Command = "PLAY";
-    break;
-  case 16769055:
-    Command = "VOL-";
-    break;
-  case 16754775:
-    Command = "VOL+";
-    break;
-  case 16748655:
-    Command = "EQ";
-    break;
-  case 16738455:
-    Command = "0";
-    break;
-  case 16724175:
-    Command = "1";
-    break;
-  case 16718055:
-    Command = "2";
-    break;
-  case 16743045:
-    Command = "3";
-    break;
-  case 16716015:
-    Command = "4";
-    break;
-  case 16726215:
-    Command = "5";
-    break;
-  case 16734885:
-    Command = "6";
-    break;
-  case 16728765:
-    Command = "7";
-    break;
-  case 16730805:
-    Command = "8";
-    break;
-  case 16732845:
-    Command = "9";
-    break;
-  case 16750695:
-    Command = "100+";
-    break;
-  case 16756815:
-    Command = "200+";
-    break;
-  default:
-    Command = "";
-    break;
-  }
 
-  if (Command == "")
-  {
-    Code = 0;
-    Command = "";
-  }
-}
 
-void Reset()
-{
-  Code = 0;
-  Command = "";
-}
 
 void IMU_recordRegisters(byte command, long value[])
 {
@@ -473,17 +425,35 @@ void IMU_Initialize()
 
 void IMU_Update()
 {
+  if (!vehicle.Sensors.Enabled)
+    return;
+  
   if (vehicle.Time % 100 == 0)
   {
-    IMU_recordAccelRegisters();
+    //IMU_recordAccelRegisters();
     IMU_recordGyroRegisters();
     if (vehicle.IMU.rotZ > 1 || vehicle.IMU.rotZ < -1)
     {
       vehicle.IMU.TotalRotationZ = vehicle.IMU.TotalRotationZ + vehicle.IMU.rotZ / 10;
     }
-//    Serial.print("TotalRotationZ: ");
-//    Serial.print(vehicle.IMU.TotalRotationZ);
-//    Serial.print("        GforceZ: ");
-//    Serial.println(vehicle.IMU.gForceZ);
+    
+    if (_showSensorLog)
+    {
+      Serial.print("Rotation: ");
+      Serial.print(vehicle.IMU.TotalRotationZ);
+//      Serial.print("     Gforce: ");
+//      Serial.print(vehicle.IMU.gForceZ);
+      Serial.print("     ScanState: ");
+      Serial.print(vehicle.Sensors.GetScanState());
+
+      Serial.print("     Left: ");
+      Serial.print(vehicle.Sensors.UltrasonicDistance1);
+      Serial.print("     Right: ");
+      Serial.print(vehicle.Sensors.UltrasonicDistance2);
+
+
+      Serial.println("");
+    }
+
   }
 }

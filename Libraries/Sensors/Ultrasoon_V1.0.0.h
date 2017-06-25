@@ -11,6 +11,8 @@
 
 class Ultrasoon
 {
+	String _version = "v1.0.1";
+
 	int temp = 30;
 	
 	float duration;
@@ -33,6 +35,8 @@ class Ultrasoon
 
 	void Initialize(int tPin, int ePin)
 	{
+		Serial.print("Ultrasoon Initialized! ");
+		Serial.println(_version);
 		pinMode(trigPin, OUTPUT);
 		pinMode(echoPin, INPUT);
 		trigPin = tPin;
@@ -47,7 +51,8 @@ class Ultrasoon
 		delayMicroseconds(10);
 		digitalWrite(trigPin, LOW);
 		
-		duration = pulseIn(echoPin, HIGH, 100);
+//		duration = pulseIn(echoPin, HIGH, 100);
+		duration = pulseIn(echoPin, HIGH, 1000);
 		if (duration == 0)
 		{
 			return 0;
@@ -55,6 +60,8 @@ class Ultrasoon
 		distance = (duration/2) * c * 10;
 		return distance;
 	}
+
+
 };
 
 #endif   // Ultrasoon_h

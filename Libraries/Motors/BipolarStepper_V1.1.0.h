@@ -14,6 +14,8 @@
 
 class BipolarStepper
 {
+	String _version = "v1.1.1";
+
     int _stepsInMotor = 200;
 	
     int _currentState = 0;
@@ -26,8 +28,6 @@ class BipolarStepper
     int _rotation = 0;
     int _speed;
     int _step;
-
-	unsigned long _time = millis();
 
     void initializePin(int id, int pin)
     {
@@ -62,7 +62,7 @@ class BipolarStepper
 		
 	//   Serial.print("Stepper.State..");
 	//   Serial.println(state);
-	  delay(10);
+	  delay(1);
       switch (state) 
 	  {
         case 1:  // Step 1
@@ -160,6 +160,8 @@ class BipolarStepper
 
 	void Initialize(int pin1, int pin2, int pin3, int pin4)
     {
+		Serial.print("BipolarStepper Initialized! ");
+		Serial.println(_version);
 		initializePin(0, pin1);
 		initializePin(1, pin2);
 		initializePin(2, pin3);
@@ -276,13 +278,15 @@ class BipolarStepper
 	
     void Update()
     {
+	  
+
 		if (_finished || _paused) 
 		{
 			return;
 		}
 
-		delay(1);
-		if (_time % _speed == 0) // Speed how fast the motor is running
+		//delay(1);
+		if (millis() % _speed == 0) // Speed how fast the motor is running
 		{
 			rotateMotor();
 		}
@@ -318,10 +322,6 @@ class BipolarStepper
 		return map(_step, 0, _stepsInMotor, 0, 359);
 	}
 
-	void SetTime(unsigned long updateTime)
-    {
-        _time = updateTime;
-    }
 };
 
 #endif   // BipolarStepper_h

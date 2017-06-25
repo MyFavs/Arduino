@@ -10,7 +10,7 @@
 class AutomatedGuidedVehicle
 {
 
-    int _rotatingSpeed = 8;
+    int _rotatingSpeed = 6;
     int _movingSpeed = 8;
 
     BipolarStepper _stepper;
@@ -19,7 +19,7 @@ class AutomatedGuidedVehicle
   public:
     // Constructor
 
-    int DetectDistance = 150;
+    //int DetectDistance = 150;
     InternalMeasurementUnit IMU;
     unsigned long Time;
     String Name = "AGV";
@@ -44,6 +44,12 @@ class AutomatedGuidedVehicle
         _motor.Stop();
     }
 
+    void Step(int steps, int spd)
+    {
+        _stepper.Step(steps, spd);  
+    }
+
+
     void Forward(int moveTime, int moveSpeed)
     {
         Serial.print("Vehicle.Forward..  ");
@@ -54,26 +60,46 @@ class AutomatedGuidedVehicle
 
     void Forward(int moveTime)
     {
-        Serial.println("Vehicle.Forward..");
+        Serial.print("Vehicle.Forward ");
+        Serial.print(moveTime);
+        Serial.println(" ms");        
         _motor.Rotate(_movingSpeed, moveTime);
     }
 
     void Backward(int moveTime)
     {
-        Serial.println("Vehicle.Backward..");
+        Serial.print("Vehicle.Backward ");
+        Serial.print(moveTime);
+        Serial.println(" ms");        
         _motor.Rotate(-_movingSpeed, moveTime);
     }
 
     void TurnRight(int degree)
     {
-        Serial.println("Vehicle.TurnRight..");
-        _stepper.Rotate(degree, _rotatingSpeed);
+        TurnRight(degree, _rotatingSpeed);
+    }
+
+    void TurnRight(int degree, int spd)
+    {
+        Serial.print("Vehicle.TurnRight ");
+        Serial.print(degree);
+        Serial.print(" degrees, speed=");
+        Serial.println(spd);
+        _stepper.Rotate(degree, spd);
     }
 
     void TurnLeft(int degree)
     {
-        Serial.println("Vehicle.TurnLeft..");
-        _stepper.Rotate(-degree, _rotatingSpeed);
+        TurnLeft(degree, _rotatingSpeed);
+    }
+    
+    void TurnLeft(int degree, int spd)
+    {
+        Serial.print("Vehicle.TurnRight ");
+        Serial.print(degree);
+        Serial.print(" degrees, speed=");
+        Serial.println(spd);
+        _stepper.Rotate(-degree, spd);
     }
 
     void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
