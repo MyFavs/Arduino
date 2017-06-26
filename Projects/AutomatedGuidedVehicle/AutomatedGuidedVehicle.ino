@@ -154,6 +154,7 @@ void loop()
   cmd_Dodge.Update();
   cmd_MoveForward.Update();
   cmd_Rotate.Update();
+  cmd_MoveToMat.Update();
   vehicle.Update();
 
 
@@ -204,7 +205,7 @@ void processUpdate()
         state++;
         yes = false;
       }
-      cmd_MoveToMat.Update();
+
       break;
       
     case 2:

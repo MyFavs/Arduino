@@ -9,6 +9,7 @@ class Command_MoveToMat
     int state = 0;
     AutomatedGuidedVehicle *vehicle;
 
+
     void printState(String value)
     {
       Serial.print(">STEP ");
@@ -18,7 +19,7 @@ class Command_MoveToMat
     }
 
 
-    void execute_MoveTillGroundNotDetected()
+    void execute_MoveTillGroundDetected()
     {
         if (!vehicle->IsMoving() && !busy)
         {
@@ -27,14 +28,13 @@ class Command_MoveToMat
             vehicle->IMU.ResetZ();
             busy = true;
         }
-       if (vehicle->Sensors.IsGroundDetected())
+       if (!vehicle->Sensors.IsGroundDetected())
        {
-      
-         printState("GROUND NOT DETECTED ANYMORE");
-         vehicle->Stop();
-         state++;
-         busy = false;
-       }
+           printState("GROUND NOT DETECTED");
+           vehicle->Stop();
+           state++;
+           busy = false;
+       }          
     }
 
 
@@ -47,26 +47,25 @@ class Command_MoveToMat
             vehicle = obj;
         }
 
-
-        void Update()
-        {
-          if (state == 0)
-            return;
-          
-          switch(state)
-          {
-              case 1:     // Voorruit totdat grond gedetecteerd is 
-                  execute_MoveTillGroundNotDetected();
-                  break;
-                  
-              default:
-                Serial.println("# Finished Command: MOVE FORWARD");
-                Serial.println("-----------------------------------");
-                state = 0;
-                break;
-                  
-          }
-        }
+    void Update()
+    {
+      if (state == 0)
+        return;
+      
+      switch(state)
+      {
+          case 1:     // Voorruit totdat grond gedetecteerd is 
+              execute_MoveTillGroundDetected();
+              break;
+              
+          default:
+            Serial.println("# Finished Command: MOVE FORWARD");
+            Serial.println("-----------------------------------");
+            state = 0;
+            break;
+              
+      }
+    }
 
 
         bool IsFinished()
@@ -76,7 +75,7 @@ class Command_MoveToMat
         
         void Start()
         {
-            Serial.println("# Executing Command: MOVE FORWARD (TO MAT)");
+            Serial.println("# Executing Command: MOVE FORWARD");
             if (vehicle->IsMoving() || busy)
                 {
                     Serial.println("MoveForward Rejected!!!");
@@ -94,57 +93,6 @@ class Command_MoveToMat
 
 
 
-
-//
-//
-//        void Update()
-//        {
-//            if (state == 0)
-//                return;
-//
-//            if (vehicle->Time % 100 != 0)
-//                return;
-//                
-//            switch(state)
-//            {
-//                case 1:
-//                    if (!vehicle->IsMoving() && !busy)
-//                        vehicle->Forward(30000);
-//                        busy = true;
-//
-//                    if (!vehicle->Sensors.IsGroundDetected())
-//                        state++;
-//                        vehicle->Stop();
-//                        busy = false;
-//                    break;
-//                case 2:
-//                   if (!vehicle->IsMoving() && !busy)
-//                   {
-//                       vehicle->Forward(1000);
-//                       busy = true;
-//                   }
-//
-//                   if (!vehicle->IsMoving())
-//                   {
-//                       state = 0;
-//                       busy = false;
-//                   }
-//                    break;
-//            }
-//        }
-//
-//        bool IsFinished()
-//        {
-//            return (state == 0);
-//        }
-//
-//        void Start()
-//        {
-//            Serial.println("- Executing Command: MOVE TO MAT");
-//
-//            if (IsFinished()) 
-//                state = 1;
-//        }
 };
 
 #endif // Command_MoveToMat_h
