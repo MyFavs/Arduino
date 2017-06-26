@@ -5,8 +5,38 @@
 
 class Command_MoveForward
 {
-    bool move = false;
+    bool busy = false;
+    int state = 0;
     AutomatedGuidedVehicle *vehicle;
+
+
+    void printState(String value)
+    {
+      Serial.print(">STEP ");
+      Serial.print(state);
+      Serial.print(":");
+      Serial.println(value);
+    }
+
+
+    void execute_MoveTillGroundDetected()
+    {
+        if (!vehicle->IsMoving() && !busy)
+        {
+            printState("MOVE FORWARD");
+            vehicle->Forward(0, 3);
+            vehicle->IMU.ResetZ();
+            busy = true;
+        }
+       if (vehicle->Sensors.IsGroundDetected())
+       {
+           printState("GROUND DETECTED");
+           vehicle->Stop();
+           state++;
+           busy = false;
+       }          
+    }
+
 
     public:
 
@@ -14,52 +44,55 @@ class Command_MoveForward
 
         Command_MoveForward(AutomatedGuidedVehicle *obj)
         {
-            // Serial.println(obj->Name);
             vehicle = obj;
-            // Serial.println(vehicle->Name);
         }
 
-        void Update()
-        {
-//            Serial.print("IsGroundDetected: ");
-//            Serial.println(vehicle->Sensors.IsGroundDetected());
-            if (!(vehicle->IsMoving()) && move)
-            {
-                // Serial.print("Moving Forward..60000..  ");
-                // Serial.println(vehicle->Name);
-                vehicle->Forward(30000);
-            }
+    void Update()
+    {
+      if (state == 0)
+        return;
+      
+      switch(state)
+      {
+          case 1:     // Voorruit totdat grond gedetecteerd is 
+              execute_MoveTillGroundDetected();
+              break;
+              
+          default:
+            Serial.println("# Finished Command: MOVE FORWARD");
+            Serial.println("-----------------------------------");
+            state = 0;
+            break;
+              
+      }
+    }
 
-            if (vehicle->Sensors.IsGroundDetected() /*|| vehicle->Sensors.IsObjectDetected())*/ && move)
-            {
-                Serial.print("Sensors detected!");
-                //Serial.println(vehicle->Sensors.IsGroundDetected() || vehicle->Sensors.IsObjectDetected());
-                move = false;
-                vehicle->Stop();
-            }
-        }
-
-        void Start()
-        {
-            if (vehicle->IsMoving())
-            {
-                Serial.println("MoveForward Rejected!!!");
-                return;
-            }
-            move = true;
-        }
 
         bool IsFinished()
         {
-            return (!move);
+            return (state == 0);
         }
-
+        
+        void Start()
+        {
+            Serial.println("# Executing Command: MOVE FORWARD");
+            if (vehicle->IsMoving() || busy)
+                {
+                    Serial.println("MoveForward Rejected!!!");
+                    return;
+                }
+            if (IsFinished()) 
+                state = 1;
+        }
+        
         void Stop()
         {
-            Serial.print("Stopped!");
-            move = false;
+            state = 0;
             vehicle->Stop();
         }
+
+
+
 };
 
 #endif // Command_MoveForward_h

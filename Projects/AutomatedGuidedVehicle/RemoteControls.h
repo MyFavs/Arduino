@@ -182,6 +182,42 @@ class RemoteControls
         case 577583:
           _command = "9";
           break;
+
+        case 538823:
+          _command = "RED";
+          break;
+        case 571463:
+          _command = "GREEN";
+          break;
+        case 546983:
+          _command = "YELLOW";
+          break;
+        case 555143:
+          _command = "BLUE";
+          break;
+
+
+
+
+        case 554633:
+          _command = "TTX";
+          break;
+        case 562793:
+          _command = "TTX_LARGE";
+          break;
+        case 553613:
+          _command = "TTX_CLOSE";
+          break;
+        case 538313:
+          _command = "TTX_PART";
+          break;
+        case 546473:
+          _command = "TTX_HELP";
+          break;
+        case 566873:
+          _command = "G";
+          break;
+
           
         default:
           _code = 0;

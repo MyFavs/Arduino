@@ -1,9 +1,9 @@
 // ----------------------------------------
-// DC motor Library v1.0
+// DC motor Library
 // ----------------------------------------
 // By Erwin & Tom
 //
-// Last Modification Date:  06-06-2017
+// Last Modification Date:  26-6-2017
 // ----------------------------------------
 
 #ifndef MotorDC_h   // If Class is not defined, then define it and use underlying code (Double Usage)
@@ -11,6 +11,7 @@
 
 class MotorDC
 {
+	String _version = "v2.0.3";
 	int _motorPin[2];
 	
 	int _speed = 0;
@@ -27,11 +28,8 @@ class MotorDC
 	
 	int setMotorState()
     {
-		Serial.print("Motor.setMotorState Speed=");
 		int speed = map(_speed, 0, 8, 0, 255);
-		Serial.println(speed);
-		Serial.print("Direction: ");
-		Serial.println(_direction);
+
 		switch(_direction)
 		{
 			case 0:									// Stop
@@ -65,22 +63,31 @@ class MotorDC
 
 	void Initialize(int RPWM, int LPWM)
     {
+		Serial.print("  [MotorDC] Initialized! ");
+		Serial.println(_version);
 		initializePin(0, RPWM);
 		initializePin(1, LPWM);
     }
 	
-	void Rotate (int speed)
+	void Rotate(int speed)
 	{
 		Rotate(speed, 0);
 	}
 
 	void Rotate(int speed, int rotationTime)
 	{
-		Serial.print("Motor.Rotate: ");
+		Serial.print("  [MotorDC] Rotate Speed=");
 		Serial.print(speed);
-		Serial.print(",");
-		Serial.println(rotationTime);
-
+		if (rotationTime == 0)
+		{
+		  	Serial.println("  Duration is ENDLESS");
+		}
+		else
+		{
+			Serial.print("  Duration=");
+			Serial.print(rotationTime);
+  			Serial.println("ms");
+		}
 		_time = millis();
 		_rotationTime = rotationTime;
 		_speed = speed;
@@ -105,12 +112,14 @@ class MotorDC
 	void Reverse()
 	{
 		_direction = -_direction;
+		Serial.print("  [MotorDC] Reverse, Direction is now ");
+		Serial.println(_direction);
 		setMotorState();
 	}
 	
 	void Stop()
 	{
-		Serial.println("Motor.Stopped");	
+		Serial.println("  [MotorDC] Stop");	
 		
 		_direction = 0;
 		_rotationTime = 0;
@@ -124,10 +133,6 @@ class MotorDC
 
 	void Update()
 	{
-		// Serial.print("Motor._rotationTime:");
-		// Serial.print(_rotationTime);
-		// Serial.print("  _time:");
-		// Serial.println(millis());
 		if (_rotationTime > 0)
 		{
 			if (millis() > _time + _rotationTime)

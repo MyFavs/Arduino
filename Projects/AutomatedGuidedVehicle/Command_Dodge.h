@@ -6,8 +6,89 @@
 class Command_Dodge
 {
     int state = 0;
+
     AutomatedGuidedVehicle *vehicle;
-    bool yes = false;
+    bool busy = false;
+
+
+    void printState(String value)
+    {
+      Serial.print(">STEP ");
+      Serial.print(state);
+      Serial.print(":");
+      Serial.println(value);
+    }
+
+    void execute_Backward()
+    {
+        if (!vehicle->IsMoving() && !busy)
+        {
+            printState("BACKING UP");
+            vehicle->Backward(1000);
+            busy = true;
+        }
+
+        if (!vehicle->IsMoving())
+        {
+            state++;
+            busy = false;
+        }
+    }
+    void execute_TurnLeft(int value)
+    {
+      execute_Turn(value, -1);
+    }
+
+    void execute_TurnRight(int value)
+    {
+      execute_Turn(value, 1);
+    }
+
+    
+    void execute_Turn(int value, int dir)
+    {
+        if (!vehicle->IsTurning() && !busy)
+        {
+            switch(dir)
+            {
+                case -1:
+                    printState("STEER LEFT");
+                    vehicle->TurnLeft(value);
+                    break;
+                case 1:
+                    printState("STEER RIGHT");
+                    vehicle->TurnRight(value);
+                    break;
+            }
+            busy = true;
+        }
+
+        if (!vehicle->IsTurning())
+        {
+            state++;
+            busy = false;
+        }
+    }
+
+    void execute_MoveTillRotationReached(int value)
+    {
+        if (!vehicle->IsMoving() && !busy)
+        {
+            printState("MOVE FORWARD");
+            vehicle->Forward(0, 3);
+            vehicle->IMU.ResetZ();
+            busy = true;
+        }
+       if (vehicle->IMU.TotalRotationZ >= value || vehicle->IMU.TotalRotationZ <= -value)
+       {
+           printState("ROTATION REACHED");
+           vehicle->IMU.ResetZ();
+           vehicle->Stop();
+           state++;
+           busy = false;
+       }          
+    }
+
 
     public:
 
@@ -20,140 +101,41 @@ class Command_Dodge
 
     void Update()
     {
-        switch(state)
-        {
-            case 0:
-                return;
-            case 1:
-                vehicle->Stop();
-                state++;
-                break;
-            // 1) Achteruit
-            case 2:
-                if (!vehicle->IsMoving() && !yes)
-                {
-                    vehicle->Backward(1000);
-                    yes = true;
-                }
+      if (state == 0)
+         return;
 
-                if (!vehicle->IsMoving())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 2) draai 45 graden naar links
-            case 3:
-                if (!vehicle->IsTurning() && !yes)
-                {
-                    vehicle->TurnLeft(45);
-                    yes = true;
-                }
-
-                if (!vehicle->IsTurning())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 3) vooruit x meter (IMU)
-            case 4:
-                if (!vehicle->IsMoving() && !yes)
-                {
-                    vehicle->Forward(1000);
-                    yes = true;
-                }
-
-                if (!vehicle->IsMoving())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 4) draai 45 graden naar rechts
-            case 5:
-                if (!vehicle->IsTurning() && !yes)
-                {
-                    vehicle->TurnRight(45);
-                    yes = true;
-                }
-
-                if (!vehicle->IsTurning())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 5) vooruit x meter (IMU)
-            case 6:
-                if (!vehicle->IsMoving()  && !yes)
-                {
-                    vehicle->Forward(1000);
-                    yes = true;
-                }
-
-                if (!vehicle->IsMoving())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 6) draai 45 graden naar rechts
-            case 7:
-                if (!vehicle->IsTurning() && !yes)
-                {
-                    vehicle->TurnRight(45);
-                    yes = true;
-                }
-
-                if (!vehicle->IsTurning())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 7) vooruit x meter (IMU)
-            case 8:
-                if (!vehicle->IsMoving() && !yes)
-                {
-                    vehicle->Forward(1000);
-                    yes = true;
-                }
-
-                if (!vehicle->IsMoving())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 8) draai 45 graden naar links
-            case 9:
-                if (!vehicle->IsTurning() && !yes)
-                {
-                    vehicle->TurnLeft(45);
-                    yes = true;
-                }
-
-                if (!vehicle->IsTurning())
-                {
-                    state++;
-                    yes = false;
-                }
-                break;
-            // 9) vooruit x meter (IMU)
-            case 10:
-                if (!vehicle->IsMoving() && !yes)
-                {
-                    vehicle->Forward(500);
-                    yes = true;
-                }
-
-                if (!vehicle->IsMoving())
-                {
-                    state = 0;
-                    yes = false;
-                }
-                break;
+      switch(state)
+      {
+          //  Achteruit
+          case 1:
+              execute_Backward();
+              break;
+          case 2:     // draai links 90 graden
+              execute_TurnLeft(45);
+              break;
+          case 3:     // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
+              execute_MoveTillRotationReached(45);
+              break;
+          case 4:     // draai rechts 90 graden
+              execute_TurnRight(90);
+              break;
+          case 5:     // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
+              execute_MoveTillRotationReached(90);
+              break;
+          case 6:     // draai links 90 graden
+              execute_TurnLeft(90);
+              break;
+          case 7:     // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
+              execute_MoveTillRotationReached(45);
+              break;
+          case 8:     // draai rechts 45 graden
+              execute_TurnRight(45);
+              break;
+          default:
+              Serial.println("# Finished Command: DODGE");
+              Serial.println("------------------------------");
+              state=0;
+              break;
         }
     }
 
@@ -164,7 +146,8 @@ class Command_Dodge
 
     void Start()
     {
-        if (vehicle->IsMoving())
+        Serial.println("# Executing Command: DODGE");
+        if (vehicle->IsMoving() || busy)
             {
                 Serial.println("Dodge Rejected!!!");
                 return;

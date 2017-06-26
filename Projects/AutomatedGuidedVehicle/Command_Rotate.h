@@ -6,134 +6,158 @@
 class Command_Rotate
 {
     int state = 0;
-    int direction = 0;
+    int _direction = 0;
     AutomatedGuidedVehicle *vehicle;
 
-    bool yes = false;
+    bool busy = false;
 
-    public:
+    void printState(String value)
+    {
+      Serial.print(">STEP ");
+      Serial.print(state);
+      Serial.print(":");
+      Serial.println(value);
+    }
 
-        Command_Rotate() {}
 
-        Command_Rotate(AutomatedGuidedVehicle *obj)
-        {   
-            vehicle = obj;
-        }
-        void Update()
+    void execute_Backward()
+    {
+        if (!vehicle->IsMoving() && !busy)
         {
-            switch(state)
+            printState("BACKING UP");
+            vehicle->Backward(1000);
+            busy = true;
+        }
+
+        if (!vehicle->IsMoving())
+        {
+            state++;
+            busy = false;
+        }
+    }
+
+    void execute_Turn(int value, int dir)
+    {
+        if (!vehicle->IsTurning() && !busy)
+        {
+            switch(dir)
             {
-                case 1:     // 1) Achteruit 
-                    if (!vehicle->IsMoving() && !yes)
-                    {
-                        Serial.println("Status is 1!!!!!");
-                        vehicle->Backward(1000);
-                        yes = true;
-                    }
-
-                    if (!vehicle->IsMoving())
-                    {
-                        state++;
-                        yes = false;
-                    }
+                case -1:
+                    printState("STEER LEFT");
+                    vehicle->TurnLeft(value);
                     break;
-
-                case 2:     // 2) draai links/rechts 90 graden
-                    if (!vehicle->IsTurning() && !yes)
-                    {
-                        Serial.println("Status is 2!!!!!");
-                        switch(direction)
-                        {
-                            case -1:
-                                vehicle->TurnLeft(70);
-                                break;
-                            case 1:
-                                vehicle->TurnRight(70);
-                                break;
-                        }
-                        yes = true;
-                    }
-
-                    if (!vehicle->IsTurning())
-                    {
-                        state++;
-                        yes = false;
-                    }
-                    break;
-                case 3:     // 3) vooruit tot 90 graden gedraaid AGV (controle IMU) & controle einde mat
-                    if (!vehicle->IsMoving() && !yes)
-                    {
-                      Serial.println("MOVING INDEFINITELY ROTATE");
-                        vehicle->Forward(30000, 3);
-                        vehicle->IMU.ResetZ();
-                        yes = true;
-                    }
-                   if (vehicle->IMU.TotalRotationZ >= 85 || vehicle->IMU.TotalRotationZ <= -85)
-                   {
-                       Serial.println("STOPPED ROTATING");
-                       vehicle->IMU.ResetZ();
-                       vehicle->Stop();
-                       state++;
-                       yes = false;
-                   }
-                    break;
-                case 4:     // 4) draai links/rechts 90 graden terug
-                    if (!vehicle->IsTurning() && !yes)
-                    {
-                        switch(direction)
-                        {
-                            case -1:
-                                vehicle->TurnRight(70);
-                                break;
-                            case 1:
-                                vehicle->TurnLeft(70);
-                                break;
-                        }
-                        yes = true;
-                    }
-
-                    if (!vehicle->IsTurning())
-                    {
-                        state = 0;
-                        yes = false;
-                    }
+                case 1:
+                    printState("STEER RIGHT");
+                    vehicle->TurnRight(value);
                     break;
             }
+            busy = true;
         }
 
-        void Left()
+        if (!vehicle->IsTurning())
         {
-            if (vehicle->IsMoving())
-            {
-                Serial.println("RotateLeft Rejected!!!");
-                return;
-            }
-            direction = -1;
-            state = 1;
+            state++;
+            busy = false;
         }
+    }
 
-        void Right()
+    void execute_MoveTillRotationReached(int value)
+    {
+        if (!vehicle->IsMoving() && !busy)
         {
-            if (vehicle->IsMoving())
-            {
-                Serial.println("RotateRight Rejected!!!");
-                return;
-            }
-            direction = 1;
-            state = 1;
+            printState("MOVE FORWARD");
+            vehicle->Forward(0, 3);
+            vehicle->IMU.ResetZ();
+            busy = true;
         }
+       if (vehicle->IMU.TotalRotationZ >= value || vehicle->IMU.TotalRotationZ <= -value)
+       {
+           printState("ROTATION REACHED");
+           vehicle->IMU.ResetZ();
+           vehicle->Stop();
+           state++;
+           busy = false;
+       }          
+    }
 
-        bool IsFinished()
-        {
-            return (state == 0);
-        }
 
-        void Stop()
-        {
-            direction = 0;
+
+public:
+
+    Command_Rotate() {}
+
+    Command_Rotate(AutomatedGuidedVehicle *obj)
+    {   
+        vehicle = obj;
+    }
+    void Update()
+    {
+      if (state == 0)
+        return;
+      
+      switch(state)
+      {
+          case 1:     // Achteruit 
+              execute_Backward();
+              break;
+          case 2:     // draai links/rechts 90 graden
+              execute_Turn(45, _direction);
+              break;
+          case 3:     // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
+              execute_MoveTillRotationReached(90);
+              break;
+          case 4:     // draai links/rechts 90 graden terug
+              _direction = -_direction;
+              execute_Turn(45, _direction);
+              break;
+              
+          default:
+            Serial.println("# Finished Command: ROTATE");
+            Serial.println("------------------------------");
             state = 0;
-            vehicle->Stop();
+            break;
+              
+      }
+    }
+
+    void Left()
+    {
+        Serial.println("# Executing Command: ROTATE LEFT");
+
+        if (vehicle->IsMoving())
+        {
+            Serial.println("RotateLeft Rejected!!!");
+            return;
         }
+        _direction = -1;
+        state = 1;
+    }
+
+    void Right()
+    {
+      
+        Serial.println("# Executing Command: ROTATE RIGHT");
+
+        if (vehicle->IsMoving())
+        {
+            Serial.println("RotateRight Rejected!!!");
+            return;
+        }
+        _direction = 1;
+        state = 1;
+    }
+
+    bool IsFinished()
+    {
+        return (state == 0);
+    }
+
+    void Stop()
+    {
+        _direction = 0;
+        state = 0;
+        vehicle->Stop();
+    }
 };
 
 #endif //Command_Rotate_h

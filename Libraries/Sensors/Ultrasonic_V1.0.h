@@ -1,32 +1,33 @@
 // ----------------------------------------
-// Ultrasoon Library v1.0
+// Ultrasonic Library
 // ----------------------------------------
 // By Tom
 //
-// Last Modification Date:  30-5-2017
+// Last Modification Date:  26-6-2017
 // ----------------------------------------
 
-#ifndef Ultrasoon_h   // If Class is not defined, then define it and use underlying code (Double Usage)
-#define Ultrasoon_h
+#ifndef Ultrasonic_h   // If Class is not defined, then define it and use underlying code (Double Usage)
+#define Ultrasonic_h
 
-class Ultrasoon
+class Ultrasonic
 {
-	String _version = "v1.0.1";
+	String _version = "v1.0.3";
 
 	int temp = 30;
 	
 	float duration;
 	int distance;
-	float c = (331 + (0.6 * temp))*100/1000000;
+	float c = (331 + (0.6 * temp)) * 100 / 1000000;
 	
-	int trigPin;
-	int echoPin;
+	int trigPin = 10;
+	int echoPin = 11;
+	
 	
 	public:
 	
-	Ultrasoon() {}
+	Ultrasonic() {}
 	
-	Ultrasoon(int tPin, int ePin)
+	Ultrasonic(int tPin, int ePin)
 	{
 		Initialize(tPin, ePin);
 	}
@@ -35,7 +36,7 @@ class Ultrasoon
 
 	void Initialize(int tPin, int ePin)
 	{
-		Serial.print("Ultrasoon Initialized! ");
+		Serial.print("  [Ultrasonic] Initialized! ");
 		Serial.println(_version);
 		pinMode(trigPin, OUTPUT);
 		pinMode(echoPin, INPUT);
@@ -51,8 +52,8 @@ class Ultrasoon
 		delayMicroseconds(10);
 		digitalWrite(trigPin, LOW);
 		
-//		duration = pulseIn(echoPin, HIGH, 100);
-		duration = pulseIn(echoPin, HIGH, 1000);
+		duration = pulseIn(echoPin, HIGH, 100);
+
 		if (duration == 0)
 		{
 			return 0;
@@ -64,4 +65,4 @@ class Ultrasoon
 
 };
 
-#endif   // Ultrasoon_h
+#endif   // Ultrasonic_h

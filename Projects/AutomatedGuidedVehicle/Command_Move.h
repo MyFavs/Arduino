@@ -39,6 +39,8 @@ class Command_Move
 
         void Start()
         {
+            Serial.println("- Executing Command: MOVE");
+          
             state = 1;
             direction = -1;
         }

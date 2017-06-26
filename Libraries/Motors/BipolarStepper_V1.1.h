@@ -1,9 +1,9 @@
 // ----------------------------------------
-// Stepper Library v1.1
+// Stepper Library
 // ----------------------------------------
 // By Erwin & Tom
 //
-// Last Modification Date:  30-5-2017
+// Last Modification Date:  26-6-2017
 // ----------------------------------------
 
 #ifndef BipolarStepper_h   // If Class is not defined, then define it and use underlying code (Double Usage)
@@ -14,7 +14,7 @@
 
 class BipolarStepper
 {
-	String _version = "v1.1.1";
+	String _version = "v1.1.3";
 
     int _stepsInMotor = 200;
 	
@@ -142,53 +142,7 @@ class BipolarStepper
     }
 
 
-
-  public:
-  
-    // Constructor
-  
-    BipolarStepper() {}
-
-    BipolarStepper(int pin1, int pin2, int pin3, int pin4)
-    {
-		Initialize(pin1, pin2, pin3, pin4);
-    }
-	
-	// -------------------------------------------------
-	// -- Commands
-	// -------------------------------------------------
-
-	void Initialize(int pin1, int pin2, int pin3, int pin4)
-    {
-		Serial.print("BipolarStepper Initialized! ");
-		Serial.println(_version);
-		initializePin(0, pin1);
-		initializePin(1, pin2);
-		initializePin(2, pin3);
-		initializePin(3, pin4);
-    }
-
-	
-    void Rotate(int degree, int spd)  // (+-Graden,+-Snelheid)
-	{
-		_rotation = 1;
-		
-		if (degree == 0)
-		{
-			return;
-		}
-		
-		if (degree < 0)
-		{
-			Reverse();
-			degree = -degree;
-		}
-		
-		int steps = map(degree, 0, 359, 0, _stepsInMotor);
-		Step(steps, spd);
-    }
-	
-    void Step(int steps, int spd)   // (+-Stappen,+-Snelheid)
+    void stepMotor(int steps, int spd)   // (+-Stappen,+-Snelheid)
     {
 		if (_rotation == 0)
 		{
@@ -232,10 +186,76 @@ class BipolarStepper
 		_currentState = _lastState;  // return the last state when the motor has stopped.
 		_finished = false;
     }
+
+
+
+  public:
+  
+    // Constructor
+  
+    BipolarStepper() {}
+
+    BipolarStepper(int pin1, int pin2, int pin3, int pin4)
+    {
+		Initialize(pin1, pin2, pin3, pin4);
+    }
+	
+	// -------------------------------------------------
+	// -- Commands
+	// -------------------------------------------------
+
+	void Initialize(int pin1, int pin2, int pin3, int pin4)
+    {
+		Serial.print("  [BipolarStepper] Initialized! ");
+		Serial.println(_version);
+		initializePin(0, pin1);
+		initializePin(1, pin2);
+		initializePin(2, pin3);
+		initializePin(3, pin4);
+    }
+
+	
+    void Rotate(int degree, int spd)  // (+-Graden,+-Snelheid)
+	{
+		Serial.print("  [BipolarStepper] Rotate  Degree=");
+		Serial.print(degree);
+		Serial.print("  Speed=");
+		Serial.println(spd);
+
+		_rotation = 1;
+		
+		if (degree == 0)
+		{
+			return;
+		}
+		
+		if (degree < 0)
+		{
+			Reverse();
+			degree = -degree;
+		}
+		
+		int steps = map(degree, 0, 359, 0, _stepsInMotor);
+		stepMotor(steps, spd);
+    }
+	
+
+    void Step(int steps, int spd)   // (+-Stappen,+-Snelheid)
+    {
+		Serial.print("  [BipolarStepper] Step  Steps=");
+		Serial.print(steps);
+		Serial.print("  Speed=");
+		Serial.println(spd);
+		stepMotor(steps, spd);
+	}
+
+
+
 	
 
 	void Pause()
 	{
+		Serial.println("  [BipolarStepper] Pause");
 		if (_paused)
 		{
 		   return;
@@ -248,6 +268,7 @@ class BipolarStepper
 	
 	void Stop()
 	{
+		Serial.println("  [BipolarStepper] Stop");
 		_finished = true;
 		_lastState = _currentState;
 		_lastRotation = _rotation;
@@ -257,6 +278,7 @@ class BipolarStepper
 	
 	void Continue()
 	{
+		Serial.println("  [BipolarStepper] Continue");
 		if (_finished)
 		{
 			return;
@@ -278,8 +300,6 @@ class BipolarStepper
 	
     void Update()
     {
-	  
-
 		if (_finished || _paused) 
 		{
 			return;

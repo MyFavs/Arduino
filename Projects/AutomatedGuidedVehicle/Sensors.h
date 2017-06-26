@@ -1,7 +1,7 @@
 #ifndef Sensors_h
 #define Sensors_h
 
-#include <Ultrasoon_V1.0.0.h>
+#include <Ultrasonic_V1.0.h>
 
 class InternalSensors
 {
@@ -10,8 +10,8 @@ class InternalSensors
 
     int _scanState;
 
-    Ultrasoon _ultrasoonLeft;
-    Ultrasoon _ultrasoonRight;
+    Ultrasonic _ultrasoonLeft;
+    Ultrasonic _ultrasoonRight;
 
 
   public:
