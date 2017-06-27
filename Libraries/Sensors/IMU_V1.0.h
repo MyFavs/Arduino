@@ -101,14 +101,7 @@ class InternalMeasurementUnit
                 rot = rot + rotZ / 10;
             }
 
-            if (gForceZ > 0.9)
-            {
-                isLevel = true;
-            }
-            else
-            {
-                isLevel = false;
-            }
+            isLevel = (gForceZ > 0.9);
         }
         
     }
