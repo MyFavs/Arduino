@@ -10,18 +10,13 @@
 #include <Wire.h>
 
 AutomatedGuidedVehicle vehicle;
-
 Command cmd(&vehicle);
-// Command_MoveToMat cmd_MoveToMat(&vehicle);
-// Command_Rotate cmd_Rotate(&vehicle);
-// Command_MoveForward cmd_MoveForward(&vehicle);
-// Command_Move cmd_Move(&vehicle);
+RemoteControls remoteControl;
 
-RemoteControls _remotes;
+// -- Infra Red
+IRrecv infraRedReveiver(12);
+decode_results infraRedResult;
 
-IRrecv irrecv(12);
-
-decode_results results;
 
 int state = 0;
 bool _processing = false;
@@ -31,12 +26,13 @@ bool busy = false;
 int moveState = 0;
 int moveDirection = 0;
 
+
 void setup()
 {
     Serial.begin(9600);
     Serial.println("Initializing");
     IMU_Initialize();
-    irrecv.enableIRIn(); // Start the receiver
+    infraRedReveiver.enableIRIn(); // Start the receiver
     vehicle.InitializeStepper(8, 9, 10, 11);
     vehicle.InitializeMotor(6, 7);
     vehicle.Sensors.InitializeUltrasonicPins(2, 4, 3, 5); // Trig1, Echo1, Trig2, Echo2
@@ -50,8 +46,8 @@ void setup()
     Serial.println("");
     Serial.println("Waiting for command...");
 
-    //_remotes.UseTypeCarMp3();
-    _remotes.UseTypeHumax();
+    //remoteControl.UseTypeCarMp3();
+    remoteControl.UseTypeHumax();
 }
 
 void loop()
@@ -59,81 +55,9 @@ void loop()
    
     vehicle.Time = millis();
     vehicle.Sensors.Time = vehicle.Time;
-    // --------------AFSTANDSBEDIENING UITVRAGEN---------------
 
-    if (irrecv.decode(&results))
-    {
-        _remotes.SetCode(results.value);
-        irrecv.resume(); // Receive the next value
-    }
+    SetCommandFromRemote();
 
-    if (_remotes.HasCode())
-    {
-        if (_remotes.IsCommand("4", "POWER"))
-        {
-            cmd.Stop();
-        }
-        if (_remotes.IsCommand("EQ", "INFO"))
-        {
-            _showSensorLog = !_showSensorLog;
-            Serial.print("# Sensor Log ");
-            Serial.println(_showSensorLog);
-        }
-
-        if (!isExecutingCommand())
-        {
-            if (_remotes.IsCommand("1"))
-            {
-                cmd.MoveToArea();
-            }
-
-            else if (_remotes.IsCommand("LEFT"))
-            {
-                cmd.Turn(-90);
-            }
-            else if (_remotes.IsCommand("RIGHT"))
-            {
-                cmd.Turn(90);
-            }
-            else if (_remotes.IsCommand("UP"))
-            {
-                cmd.MoveForward();
-            }
-            else if (_remotes.IsCommand("DOWN"))
-            {
-                cmd.MoveBackward();
-            }
-            else if (_remotes.IsCommand("BLUE"))
-            {
-                cmd.Turn(180);
-            }
-            else if (_remotes.IsCommand("YELLOW"))
-            {
-                cmd.Turn(-180);
-            }
-            else if (_remotes.IsCommand("RED"))
-            {
-                cmd.Dodge();
-            }
-
-            // else if (_remotes.IsCommand("CH+"))
-            // {
-            //     vehicle.Sensors.Enabled = false;
-            //     vehicle.Step(100, 4);
-            // }
-            // else if (_remotes.IsCommand("CH-"))
-            // {
-            //     vehicle.Sensors.Enabled = false;
-            //     vehicle.Step(100, -4);
-            // }
-
-            else if (_remotes.IsCommand("GUIDE"))
-            {
-                start(); // StartHarvesting
-            }
-            _remotes.Reset();
-        }
-    }
 
     //processUpdate();
     IMU_Update();
@@ -157,7 +81,6 @@ bool isExecutingCommand()
 
     return false;
 }
-
 
 
 void start()
@@ -350,6 +273,90 @@ void start()
 //         break;
 //     }
 // }
+
+void SetCommandFromRemote()
+{
+    if (infraRedReveiver.decode(&infraRedResult))
+    {
+        remoteControl.SetCode(infraRedResult.value);
+        infraRedReveiver.resume(); // Receive the next value
+    }
+
+    if (remoteControl.HasCode())
+    {
+        if (remoteControl.IsCommand("OK","POWER"))
+        {
+            cmd.Stop();
+        }
+        else if (remoteControl.IsCommand("EQ", "INFO"))
+        {
+            _showSensorLog = !_showSensorLog;
+            Serial.print("# Sensor Log ");
+            Serial.println(_showSensorLog);
+        }
+        else if (remoteControl.IsCommand("CH+"))
+        {
+            vehicle.Step(1, 4);
+        }
+        else if (remoteControl.IsCommand("CH-"))
+        {
+            vehicle.Step(-1, 4);
+        }
+
+
+
+        if (!isExecutingCommand())
+        {
+            if (remoteControl.IsCommand("1"))
+            {
+                cmd.MoveToArea();
+            }
+            else if (remoteControl.IsCommand("2"))
+            {
+                cmd.Boost();
+            }
+            else if (remoteControl.IsCommand("LEFT"))
+            {
+                cmd.Turn(-90);
+            }
+            else if (remoteControl.IsCommand("RIGHT"))
+            {
+                cmd.Turn(90);
+            }
+            else if (remoteControl.IsCommand("UP"))
+            {
+                cmd.MoveForward();
+            }
+            else if (remoteControl.IsCommand("DOWN"))
+            {
+                cmd.MoveBackward();
+            }
+
+            else if (remoteControl.IsCommand("BLUE"))
+            {
+                cmd.Turn(180);
+            }
+            else if (remoteControl.IsCommand("YELLOW"))
+            {
+                cmd.Turn(-180);
+            }
+            else if (remoteControl.IsCommand("RED"))
+            {
+                cmd.Dodge();
+            }
+
+
+
+            else if (remoteControl.IsCommand("GUIDE"))
+            {
+                start(); // StartHarvesting
+            }
+            remoteControl.Reset();
+        }
+    }
+}
+
+
 
 void IMU_recordRegisters(byte command, long value[])
 {

@@ -50,40 +50,26 @@ class AutomatedGuidedVehicle
     }
 
 
-    void Forward(int moveTime, int moveSpeed)
+    void Move(int spd, int moveTime)
     {
-        Serial.print("Vehicle.Forward  Duration=");
+        if (spd == 0)
+            return;
+
+        if (spd > 0)
+            Serial.print("Vehicle.Move(Forward)  Duration=");
+        else 
+            Serial.print("Vehicle.Move(Backward)  Duration=");
+
         Serial.print(moveTime);
         Serial.print("ms  Speed=");        
-        Serial.println(moveSpeed);
-        _motor.Rotate(moveSpeed, moveTime);
-    }
-
-    void Forward(int moveTime)
-    {
-        Forward(moveTime, _movingSpeed);
+        Serial.println(spd);
+        _motor.Rotate(spd, moveTime);
     }
 
 
-
-    void Backward(int moveTime, int moveSpeed)
+    void Turn(int degree, int spd)
     {
-        Serial.print("Vehicle.Backward  Duration=");
-        Serial.print(moveTime);
-        Serial.print("ms  Speed=");        
-        Serial.println(moveSpeed);
-        _motor.Rotate(-_movingSpeed, moveTime);
-    }
-
-    void Backward(int moveTime)
-    {
-        Backward(moveTime, _movingSpeed);
-    }
-
-
-    void TurnRight(int degree, int spd)
-    {
-        Serial.print("Vehicle.TurnRight  Degrees=");
+        Serial.print("Vehicle.Turn  Degrees=");
         Serial.print(degree);
         Serial.print("  Speed=");
         Serial.println(spd);
@@ -91,25 +77,11 @@ class AutomatedGuidedVehicle
     }
 
 
-    void TurnRight(int degree)
+    void Turn(int degree)
     {
-        TurnRight(degree, _rotatingSpeed);
+        Turn(degree, _rotatingSpeed);
     }
 
-    
-    void TurnLeft(int degree, int spd)
-    {
-        Serial.print("Vehicle.TurnLeft  Degrees=");
-        Serial.print(degree);
-        Serial.print("  Speed=");
-        Serial.println(spd);
-        _stepper.Rotate(-degree, spd);
-    }
-
-    void TurnLeft(int degree)
-    {
-        TurnLeft(degree, _rotatingSpeed);
-    }
     
 
     void InitializeStepper(int pin1, int pin2, int pin3, int pin4)

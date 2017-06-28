@@ -10,6 +10,7 @@ class Command
     String command = "";
     int turnradius = 0;
 
+
     AutomatedGuidedVehicle *vehicle;
     
 
@@ -53,12 +54,18 @@ class Command
     }
 
 
-    void execute_Backward()
+// --------------------------  COMMANDS -------------------------------
+
+    void execute_Move(int speed, int duration)
     {
         if (!vehicle->IsMoving() && !busy)
         {
-            printState("BACKING UP");
-            vehicle->Backward(1000,1);
+            if (speed > 0)
+                printState("MOVE FORWARD");
+            else
+                printState("MOVE BACKWARD");
+
+            vehicle->Move(speed, duration);
             busy = true;
         }
 
@@ -69,28 +76,14 @@ class Command
         }
     }
 
-    void execute_Forward()
-    {
-        if (!vehicle->IsMoving() && !busy)
-        {
-            printState("FAST FORWARD");
-            vehicle->Forward(2000, 8);
-            busy = true;
-        }
 
-        if (!vehicle->IsMoving())
-        {
-            state++;
-            busy = false;
-        }
-    }
 
     void execute_MoveTillAreaDetected()
     {
         if (!vehicle->IsMoving() && !busy)
         {
             printState("MOVE FORWARD");
-            vehicle->Forward(0, 2);
+            vehicle->Move(2,0);
             vehicle->IMU.ResetZ();
             busy = true;
         }
@@ -108,7 +101,7 @@ class Command
         if (!vehicle->IsMoving() && !busy)
         {
             printState("MOVE FORWARD");
-            vehicle->Forward(0, 2);
+            vehicle->Move(2,0);
             vehicle->IMU.ResetZ();
             busy = true;
         }
@@ -133,7 +126,7 @@ class Command
         if (!vehicle->IsMoving() && !busy)
         {
             printState("MOVE FORWARD");
-            vehicle->Forward(0, 3);
+            vehicle->Move(2,0);
             vehicle->IMU.ResetZ();
             busy = true;
         }
@@ -147,36 +140,20 @@ class Command
        }          
     }
 
-    // void execute_TurnLeft(int value)
-    // {
-    //     execute_Turn(value, -1);
-    // }
-
-    // void execute_TurnRight(int value)
-    // {
-    //     execute_Turn(value, 1);
-    // }
-
     
     void execute_Turn(int value)
     {
-        int dir = 1;
-        if (value < 0)
-            dir = -1;
+        if (value == 0)
+          return;
 
         if (!vehicle->IsTurning() && !busy)
         {
-            switch(dir)
-            {
-                case -1:
-                    printState("STEER LEFT");
-                    vehicle->TurnLeft(-value);
-                    break;
-                case 1:
-                    printState("STEER RIGHT");
-                    vehicle->TurnRight(value);
-                    break;
-            }
+            if (value > 0)
+                printState("STEER RIGHT");
+            else
+                printState("STEER LEFT");
+
+            vehicle->Turn(value);
             busy = true;
         }
 
@@ -196,16 +173,28 @@ class Command
 // --------------------------  UPDATE -------------------------------
 
 
+    void update_Boost()
+    {
+        switch (state)
+        {
+            case 1: // Voorruit
+                execute_Move(8, 2000);
+                break;
 
+            default:
+                finished();
+                break;
+        }
+    }
     void update_Forward()
     {
         switch (state)
         {
-            case 1: // Voorruit totdat grond gedetecteerd is
-                execute_Forward();
-                break;
+            // case 1: // Voorruit 
+            //     execute_Move(2, 1000);
+            //     break;
 
-            case 2: // Voorruit totdat grond gedetecteerd is
+            case 1: // Voorruit totdat grond gedetecteerd is
                 execute_MoveTillGroundDetected();
                 break;
 
@@ -218,8 +207,8 @@ class Command
     {
         switch (state)
         {
-            case 1: // Voorruit totdat grond gedetecteerd is
-                execute_Backward();
+            case 1: // Achteruit 
+                execute_Move(-2,1000);
                 break;
 
             default:
@@ -234,7 +223,7 @@ class Command
         {
             //  Achteruit
             case 1:
-                execute_Backward();
+                execute_Move(-2, 4000);
                 break;
             case 2: // draai links 90 graden
                 execute_Turn(-35);
@@ -278,36 +267,13 @@ class Command
     }
 
 
-    // void update_TurnArround()
-    // {
-    //     switch (state)
-    //     {
-    //         case 1: // Achteruit
-    //             execute_Backward();
-    //             break;
-    //         case 2: // draai links
-    //             execute_TurnLeft(45);
-    //             break;
-    //         case 3: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-    //             execute_MoveTillRotationReached(180);
-    //             break;
-    //         case 4: // draai rechts
-    //             execute_TurnRight(45);
-    //             break;
-
-    //         default:
-    //             finished();
-    //             break;
-    //     }
-    // }
-
 
     void update_Turn()
     {
         switch (state)
         {
             case 1: // Achteruit
-                execute_Backward();
+                execute_Move(-2, 5000);
                 break;
             case 2: // draai links
                 if (turnradius < 0)
@@ -330,54 +296,6 @@ class Command
                 break;
         }
     }
-
-
-    // void update_TurnLeft()
-    // {
-    //     switch (state)
-    //     {
-    //         case 1: // Achteruit
-    //             execute_Backward();
-    //             break;
-    //         case 2: // draai links
-    //             execute_TurnLeft(45);
-    //             break;
-    //         case 3: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-    //             execute_MoveTillRotationReached(90);
-    //             break;
-    //         case 4: // draai rechts
-    //             execute_TurnRight(45);
-    //             break;
-
-    //         default:
-    //             finished();
-    //             break;
-    //     }
-    // }
-
-    // void update_TurnRight()
-    // {
-    //     switch (state)
-    //     {
-    //         case 1: // Achteruit
-    //             execute_Backward();
-    //             break;
-    //         case 2: // draai rechts
-    //             execute_TurnRight(45);
-    //             break;
-    //         case 3: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-    //             execute_MoveTillRotationReached(90);
-    //             break;
-    //         case 4: // draai links
-    //             execute_TurnLeft(45);
-    //             break;
-
-    //         default:
-    //             finished();
-    //             break;
-    //     }
-    // }
-
 
 
 
@@ -403,37 +321,31 @@ public:
             update_Forward();
             return;
         }
+
         if (command == "MOVE BACKWARD")
         {
             update_Backward();
             return;
         }        
+
         if (command == "DODGE")
         {
             update_Dodge();
             return;
         }
+
         if (command == "TURN")
         {
             update_Turn();
             return;
         }
 
-        // if (command == "TURN LEFT")
-        // {
-        //     update_TurnLeft();
-        //     return;
-        // }
-        // if (command == "TURN RIGHT")
-        // {
-        //     update_TurnRight();
-        //     return;
-        // }        
-        // if (command == "TURN ARROUND")
-        // {
-        //     update_TurnArround();
-        //     return;
-        // }
+        if (command == "BOOST")
+        {
+            update_Boost();
+            return;
+        }
+
         if (command == "MOVE TO AREA")
         {
             update_MoveToArea();
@@ -446,41 +358,33 @@ public:
         return (state == 0);
     }
 
-    void MoveForward()
+    void Boost()
     {
-        execute("MOVE FORWARD");
+        execute("BOOST");
+    }
+    void Dodge()
+    {
+        execute("DODGE");
     }
     void MoveBackward()
     {
         execute("MOVE BACKWARD");
     }    
-    void Dodge()
+    void MoveForward()
     {
-        execute("DODGE");
+        execute("MOVE FORWARD");
     }
+    void MoveToArea()
+    {
+        execute("MOVE TO AREA");
+    }    
     void Turn(int value)
     {
         turnradius = value;
         execute("TURN");
     }
 
-    // void TurnLeft()
-    // {
-    //     execute("TURN LEFT");
-    // }
-    // void TurnRight()
-    // {
-    //     execute("TURN RIGHT");
-    // }
-    // void TurnArround()
-    // {
-    //     execute("TURN ARROUND");
-    // }
 
-    void MoveToArea()
-    {
-        execute("MOVE TO AREA");
-    }
 
 
     void Stop()
