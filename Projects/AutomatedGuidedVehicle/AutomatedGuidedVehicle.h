@@ -9,10 +9,6 @@
 
 class AutomatedGuidedVehicle
 {
-
-    int _rotatingSpeed = 6;
-    int _movingSpeed = 8;
-
     BipolarStepper _stepper;
     MotorDC _motor;
 
@@ -77,11 +73,6 @@ class AutomatedGuidedVehicle
     }
 
 
-    void Turn(int degree)
-    {
-        Turn(degree, _rotatingSpeed);
-    }
-
     
 
     void InitializeStepper(int pin1, int pin2, int pin3, int pin4)
@@ -106,11 +97,7 @@ class AutomatedGuidedVehicle
 
     void Update()
     {
-        //Time = millis();
-
-        
-
-        _motor.Update();
+         _motor.Update();
         _stepper.Update();
     }
 };

@@ -96,7 +96,7 @@ class Command
        }          
     }    
 
-    void execute_MoveTillGroundDetected()
+    void execute_MoveTillObjectDetected()
     {
         if (!vehicle->IsMoving() && !busy)
         {
@@ -108,6 +108,13 @@ class Command
         if (vehicle->Sensors.IsGroundDetected())
         {
             printState("GROUND DETECTED");
+            vehicle->Stop();
+            state++;
+            busy = false;
+        }
+        if (vehicle->Sensors.IsObjectDetected())
+        {
+            printState("OBJECT DETECTED");
             vehicle->Stop();
             state++;
             busy = false;
@@ -132,12 +139,20 @@ class Command
         }
        if (vehicle->IMU.TotalRotationZ >= rot || vehicle->IMU.TotalRotationZ <= -rot)
        {
-           printState("ROTATION REACHED");
-           vehicle->IMU.ResetZ();
-           vehicle->Stop();
-           state++;
-           busy = false;
-       }          
+            printState("ROTATION REACHED");
+            vehicle->IMU.ResetZ();
+            vehicle->Stop();
+            state++;
+            busy = false;
+       }   
+       if (vehicle->Sensors.IsGroundDetected())
+       {
+            printState("GROUND DETECTED");
+            vehicle->Stop();
+            state = 999;
+            busy = false;
+       }
+
     }
 
     
@@ -153,7 +168,7 @@ class Command
             else
                 printState("STEER LEFT");
 
-            vehicle->Turn(value);
+            vehicle->Turn(value, 2);
             busy = true;
         }
 
@@ -195,7 +210,7 @@ class Command
             //     break;
 
             case 1: // Voorruit totdat grond gedetecteerd is
-                execute_MoveTillGroundDetected();
+                execute_MoveTillObjectDetected();
                 break;
 
             default:
@@ -224,6 +239,7 @@ class Command
             //  Achteruit
             case 1:
                 execute_Move(-2, 4000);
+                vehicle->Sensors.SetDuckySensor(false);
                 break;
             case 2: // draai links 90 graden
                 execute_Turn(-35);

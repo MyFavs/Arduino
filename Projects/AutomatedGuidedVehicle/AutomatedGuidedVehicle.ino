@@ -1,9 +1,5 @@
 #include "AutomatedGuidedVehicle.h"
 #include "Commands.h"
-// #include "Command_Move.h"
-// #include "Command_MoveForward.h"
-// #include "Command_MoveToMat.h"
-// #include "Command_Rotate.h"
 #include "Sensors.h"
 #include <IRremote.h>
 #include "RemoteControls.h"
@@ -13,15 +9,21 @@ AutomatedGuidedVehicle vehicle;
 Command cmd(&vehicle);
 RemoteControls remoteControl;
 
+
+
+
 // -- Infra Red
 IRrecv infraRedReveiver(12);
 decode_results infraRedResult;
+
 
 
 int state = 0;
 bool _processing = false;
 bool _showSensorLog = false;
 bool busy = false;
+
+int harvestdirection = -180;
 
 int moveState = 0;
 int moveDirection = 0;
@@ -83,196 +85,177 @@ bool isExecutingCommand()
 }
 
 
-void start()
+void printState(String value)
 {
-    _processing = true;
+    Serial.print(">HARVESTING STEP ");
+    Serial.print(state);
+    Serial.print(":");
+    Serial.println(value);
+}
+
+bool IsFinished()
+{
+    return (state == 0);
+}
+
+void finished()
+{
+    Serial.print("# Finished Hasvesting");
+    Serial.println("-----------------------------------");
+    state = 0;
+    busy = false;
+}
+
+
+void Start()
+{
+    Serial.println("# Executing Start Harvesting");
+    if (state != 0 || busy)
+    {
+        Serial.println("Harvesting Rejected!!!");
+        return;
+    }
     state = 1;
 }
 
-// void processUpdate()
-// {
-//     switch (state)
-//     {
-//     case 0:
-//         return;
+// ------------------------ EXECTUTE COMMANDS --------------------
+void execute_MoveTillAreaDetected()
+{
+    if (cmd.IsFinished() && !busy)
+    {
+        printState("MOVE TO AREA");
+        cmd.MoveToArea();
+        busy = true;
+    }
+    if (cmd.IsFinished())
+    {
+        state++;
+        busy = false;
+    }          
+}  
 
-//     case 1:
-//         if (cmd_MoveToMat.IsFinished() && !busy)
-//         {
-//             //delay(1000);
-//             cmd_MoveToMat.Start();
-//             busy = true;
-//             Serial.println("STATE 1");
-//         }
+void execute_Boost()
+{
+    if (cmd.IsFinished() && !busy)
+    {
+        printState("BOOST");
+        cmd.Boost();
+        busy = true;
+    }
+    if (cmd.IsFinished())
+    {
+        state++;
+        busy = false;
+    }          
+} 
 
-//         if (cmd_MoveToMat.IsFinished())
-//         {
-//             state++;
-//             busy = false;
-//         }
+void execute_MoveTillObjectDetected(int rotate, int dodge)
+{
+    if (cmd.IsFinished() && !busy)
+    {
+        printState("MOVE");
+        cmd.MoveForward();
+        busy = true;
+    }
+    if (cmd.IsFinished())
+    {
+        if (vehicle.Sensors.IsGroundDetected())
+        {
+            state = rotate; // Naar roteren 180 graden
+        }
+        if (vehicle.Sensors.IsObjectDetected())
+        {
+            state = dodge; // Dodge
+        }
+        busy = false;
+    }    
+}
 
-//         break;
+void execute_Dodge(int next)
+{
+    if (cmd.IsFinished() && !busy)
+    {
+        printState("DODGE");
+        cmd.Dodge();
+        busy = true;
+    }
+    if (cmd.IsFinished())
+    {
+        if (vehicle.Sensors.IsGroundDetected())
+        {
+            state = 999;
+        }        
+        else
+        {
+            state = next;
+        }
+        busy = false;
+    }    
+}
 
-//     case 2:
-//         if (cmd_Rotate.IsFinished() && !busy)
-//         {
-//             cmd_Rotate.Right();
-//             busy = true;
-//             Serial.println("STATE 2");
-//         }
+void execute_TurnAround(int next)
+{
+    if (cmd.IsFinished() && !busy)
+    {
+        printState("TURN AROUND");
+        cmd.Turn(harvestdirection);  // of -180
+        busy = true;
+    }
+    if (cmd.IsFinished())
+    {
+        if (vehicle.Sensors.IsGroundDetected())
+        {
+            state = 999;
+        }        
+        else
+        {
+            state = next;
+        }
+        harvestdirection = -harvestdirection;
+        busy = false;
+    }    
+}
 
-//         if (cmd_Rotate.IsFinished())
-//         {
-//             state++;
-//             busy = false;
-//         }
-//         break;
 
-//     case 3:
-//         if (cmd_MoveForward.IsFinished() && !busy)
-//         {
-//             cmd_MoveForward.Start();
-//             busy = true;
-//             Serial.println("STATE 3");
-//         }
-//         if (cmd_MoveForward.IsFinished())
-//         {
-//             state++;
-//             busy = false;
-//         }
-//         break;
+// ---------------------------- UPDATE -------------------
+void Update()
+{
+    if (state == 0)
+        return;
 
-//     case 4:
-//         if (cmd_Rotate.IsFinished() && !busy)
-//         {
-//             cmd_Rotate.Left();
-//             busy = true;
-//             Serial.println("STATE 4");
-//         }
+    switch (state)
+    {
+        case 1:
+            if (!vehicle.Sensors.IsGroundDetected())
+            {
+                state = 3;
+                break;
+            }
+            execute_MoveTillAreaDetected();
+            break;
+        case 2: 
+            execute_Boost();
+            break;
+        case 3: 
+            execute_MoveTillObjectDetected(5, 6);
+            break;
 
-//         if (cmd_Rotate.IsFinished())
-//         {
-//             state++;
-//             busy = false;
-//         }
-//         break;
+        case 5: 
+            execute_TurnAround(3);
+            break;
 
-//     case 5:
-//         if (MoveIsFinished() && !busy)
-//         {
-//             MoveStart();
-//             busy = true;
-//             Serial.println("STATE 5");
-//         }
+        case 6: 
+            execute_Dodge(3);
+            break;
 
-//         if (MoveIsFinished())
-//         {
-//             state = 0;
-//             _processing = false;
-//             busy = false;
-//         }
-//         break;
-//     default:
-//         break;
-//     }
-// }
+        default:
+            finished();
+            break;
+    }
+}
 
-// void MoveStart()
-// {
-//     moveState = 1;
-//     moveDirection = -1;
-// }
 
-// bool MoveIsFinished()
-// {
-//     return (moveState == 0);
-// }
 
-// bool jo = false;
-
-// void MoveUpdate()
-// {
-//     switch (moveState)
-//     {
-//     case 1:
-//         if (cmd_MoveForward.IsFinished() && !jo)
-//         {
-//             cmd_MoveForward.Start();
-//             jo = true;
-//         }
-
-//         if (cmd_MoveForward.IsFinished())
-//         {
-//             if (vehicle.Sensors.IsObjectDetected())
-//             {
-//                 moveState = 2;
-//             }
-
-//             if (vehicle.Sensors.IsGroundDetected())
-//             {
-//                 moveState = 3;
-//             }
-//             jo = false;
-//         }
-
-//         break;
-//     case 2:
-//         if (cmd_Dodge.IsFinished() && !jo)
-//         {
-//             cmd_Dodge.Start();
-//             jo = true;
-//         }
-
-//         if (cmd_Dodge.IsFinished())
-//         {
-//             moveState = 1;
-//             jo = false;
-//         }
-//         break;
-
-//     case 3:
-//         if (cmd_Rotate.IsFinished() && !jo)
-//         {
-//             if (moveDirection == -1)
-//             {
-//                 cmd_Rotate.Left();
-//             }
-//             else if (moveDirection == 1)
-//             {
-//                 cmd_Rotate.Right();
-//             }
-//             jo = true;
-//         }
-
-//         if (cmd_Rotate.IsFinished())
-//         {
-//             moveState = 4;
-//             jo = false;
-//         }
-//         break;
-//     case 4:
-//         if (cmd_Rotate.IsFinished() && !jo)
-//         {
-//             if (moveDirection == -1)
-//             {
-//                 cmd_Rotate.Left();
-//             }
-//             else if (moveDirection == 1)
-//             {
-//                 cmd_Rotate.Right();
-//             }
-//             jo = true;
-//         }
-
-//         if (cmd_Rotate.IsFinished())
-//         {
-//             moveState = 1;
-//             moveDirection = -moveDirection;
-//             jo = false;
-//         }
-//         break;
-//     }
-// }
 
 void SetCommandFromRemote()
 {
@@ -288,7 +271,7 @@ void SetCommandFromRemote()
         {
             cmd.Stop();
         }
-        else if (remoteControl.IsCommand("EQ", "INFO"))
+        else if (remoteControl.IsCommand("INFO"))
         {
             _showSensorLog = !_showSensorLog;
             Serial.print("# Sensor Log ");
@@ -302,8 +285,16 @@ void SetCommandFromRemote()
         {
             vehicle.Step(-1, 4);
         }
+        else if (remoteControl.IsCommand("VOL+"))
+        {
+            vehicle.Sensors.SetDuckySensor(true);
+        }
+        else if (remoteControl.IsCommand("VOL-"))
+        {
+            vehicle.Sensors.SetDuckySensor(false);
+        }
 
-
+        
 
         if (!isExecutingCommand())
         {
@@ -349,14 +340,14 @@ void SetCommandFromRemote()
 
             else if (remoteControl.IsCommand("GUIDE"))
             {
-                start(); // StartHarvesting
+                Start(); // StartHarvesting
             }
             remoteControl.Reset();
         }
     }
 }
 
-
+// --------------------------- IMU Stuff --------------------------
 
 void IMU_recordRegisters(byte command, long value[])
 {
@@ -374,9 +365,7 @@ void IMU_recordRegisters(byte command, long value[])
     while (Wire.available() < 6)
     {
         if (millis() > vehicle.Time + 500)
-        {
             return;
-        }
     }
     value[0] = Wire.read() << 8 | Wire.read();
     value[1] = Wire.read() << 8 | Wire.read();

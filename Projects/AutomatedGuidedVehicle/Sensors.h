@@ -10,9 +10,17 @@ class InternalSensors
 
     int _scanState;
 
-    Ultrasonic _ultrasoonLeft;
-    Ultrasonic _ultrasoonRight;
+    Ultrasonic _uSonic1;
+    Ultrasonic _uSonic2;
 
+    int _duckySonicSensor = 0;
+    bool useDuckySensor = true;
+
+
+    bool ultraSonicInRange(int value)
+    {
+        return (UltrasonicDistance1 > 100 && UltrasonicDistance1 < 300);
+    }
 
   public:
     InternalSensors() {}
@@ -28,12 +36,15 @@ class InternalSensors
     int UltrasonicDistance1 = 0;
     int UltrasonicDistance2 = 0;
 
+    
+
+
     unsigned long Time;
     
-    void InitializeUltrasonicPins(int LeftTrigPin, int LeftEchoPin, int RightTrigPin, int RightEchoPin)
+    void InitializeUltrasonicPins(int trigPin1, int echoPin1, int trigPin2, int echoPin2)
     {
-        _ultrasoonLeft.Initialize(LeftTrigPin, LeftEchoPin);    
-        _ultrasoonRight.Initialize(RightTrigPin, RightEchoPin); 
+        _uSonic1.Initialize(trigPin1, echoPin1);    
+        _uSonic2.Initialize(trigPin2, echoPin2); 
     }
 
     void InitializeDetectorPins(int pinLeft, int pinRight)
@@ -55,25 +66,26 @@ class InternalSensors
         }
 
         _scanState = 0;
-        int scannedLeft = _ultrasoonLeft.Scan();
-        int scannedRight = _ultrasoonRight.Scan();
+        if (useDuckySensor)
+        {
+            UltrasonicDistance1 = _duckySonicSensor;
+            UltrasonicDistance2 = _duckySonicSensor;
+        }
+        else
+        {
+            UltrasonicDistance1 = _uSonic1.Scan();
+            UltrasonicDistance2 = _uSonic2.Scan();
+        }
 
-        UltrasonicDistance1 = scannedLeft;
-        UltrasonicDistance2 = scannedRight;
-        
-        // int scannedLeft = 0;
-        // int scannedRight = 0;
 
-//        Serial.print(scannedLeft);
-//        Serial.print("                ");
-//        Serial.println(scannedRight);
 
-        if (scannedLeft < 300 && scannedLeft > 100)
+
+        if (ultraSonicInRange(UltrasonicDistance1))
         {
             _scanState += 1;
         }
 
-        if (scannedRight < 300 && scannedRight > 100)
+        if (ultraSonicInRange(UltrasonicDistance2))
         {
             _scanState += 2;
         }
@@ -87,6 +99,16 @@ class InternalSensors
         {
             _scanState += 8;
         }
+    }
+
+    void SetDuckySensor(bool value)
+    {
+        if (value)
+        {
+            _duckySonicSensor = 200;
+            return;
+        }
+        _duckySonicSensor = 0;
     }
 
     int GetScanState()
