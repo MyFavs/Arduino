@@ -58,7 +58,7 @@ class Command
         if (!vehicle->IsMoving() && !busy)
         {
             printState("BACKING UP");
-            vehicle->Backward(2000,2);
+            vehicle->Backward(1000,1);
             busy = true;
         }
 
@@ -125,6 +125,11 @@ class Command
 
     void execute_MoveTillRotationReached(int value)
     {
+        int rot = value;
+        if (rot < 0)
+        {
+            rot = -rot;
+        }
         if (!vehicle->IsMoving() && !busy)
         {
             printState("MOVE FORWARD");
@@ -132,7 +137,7 @@ class Command
             vehicle->IMU.ResetZ();
             busy = true;
         }
-       if (vehicle->IMU.TotalRotationZ >= value || vehicle->IMU.TotalRotationZ <= -value)
+       if (vehicle->IMU.TotalRotationZ >= rot || vehicle->IMU.TotalRotationZ <= -rot)
        {
            printState("ROTATION REACHED");
            vehicle->IMU.ResetZ();
@@ -165,7 +170,7 @@ class Command
             {
                 case -1:
                     printState("STEER LEFT");
-                    vehicle->TurnLeft(value);
+                    vehicle->TurnLeft(-value);
                     break;
                 case 1:
                     printState("STEER RIGHT");
@@ -232,25 +237,25 @@ class Command
                 execute_Backward();
                 break;
             case 2: // draai links 90 graden
-                execute_Turn(-45);
+                execute_Turn(-35);
                 break;
             case 3: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-                execute_MoveTillRotationReached(45);
+                execute_MoveTillRotationReached(35);
                 break;
             case 4: // draai rechts 90 graden
-                execute_Turn(90);
+                execute_Turn(70);
                 break;
             case 5: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-                execute_MoveTillRotationReached(90);
+                execute_MoveTillRotationReached(70);
                 break;
             case 6: // draai links 90 graden
-                execute_Turn(-90);
+                execute_Turn(-70);
                 break;
             case 7: // vooruit tot x graden gedraaid AGV (controle IMU) & controle einde mat
-                execute_MoveTillRotationReached(45);
+                execute_MoveTillRotationReached(35);
                 break;
             case 8: // draai rechts 45 graden
-                execute_Turn(45);
+                execute_Turn(35);
                 break;
             default:
                 finished();
