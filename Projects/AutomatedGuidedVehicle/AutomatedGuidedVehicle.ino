@@ -65,6 +65,7 @@ void loop()
     IMU_Update();
     vehicle.Sensors.Update();
     //MoveUpdate();
+    Update();
     cmd.Update();
     vehicle.Update();
 }
@@ -106,7 +107,12 @@ void finished()
     busy = false;
 }
 
-
+void Stop()
+{
+    state = 0;
+    busy = false;
+}
+    
 void Start()
 {
     Serial.println("# Executing Start Harvesting");
@@ -220,6 +226,7 @@ void execute_TurnAround(int next)
 // ---------------------------- UPDATE -------------------
 void Update()
 {
+  //if (millis() % 100 == 0)    Serial.println(state);
     if (state == 0)
         return;
 
@@ -269,6 +276,7 @@ void SetCommandFromRemote()
     {
         if (remoteControl.IsCommand("OK","POWER"))
         {
+            Stop();
             cmd.Stop();
         }
         else if (remoteControl.IsCommand("INFO"))
@@ -277,14 +285,14 @@ void SetCommandFromRemote()
             Serial.print("# Sensor Log ");
             Serial.println(_showSensorLog);
         }
-        else if (remoteControl.IsCommand("CH+"))
-        {
-            vehicle.Step(1, 4);
-        }
-        else if (remoteControl.IsCommand("CH-"))
-        {
-            vehicle.Step(-1, 4);
-        }
+//        else if (remoteControl.IsCommand("CH+"))
+//        {
+//            vehicle.Step(1, 4);
+//        }
+//        else if (remoteControl.IsCommand("CH-"))
+//        {
+//            vehicle.Step(-1, 4);
+//        }
         else if (remoteControl.IsCommand("VOL+"))
         {
             vehicle.Sensors.SetDuckySensor(true);
