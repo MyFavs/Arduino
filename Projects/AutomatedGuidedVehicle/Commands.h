@@ -193,7 +193,7 @@ class Command
         switch (state)
         {
             case 1: // Voorruit
-                execute_Move(8, 2000);
+                execute_Move(8, 3000);
                 break;
 
             default:
@@ -289,7 +289,7 @@ class Command
         switch (state)
         {
             case 1: // Achteruit
-                execute_Move(-2, 5000);
+                execute_Move(-2, 7000);
                 break;
             case 2: // draai links
                 if (turnradius < 0)

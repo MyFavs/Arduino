@@ -29,6 +29,8 @@ int moveState = 0;
 int moveDirection = 0;
 
 
+void Update();
+
 void setup()
 {
     Serial.begin(9600);
@@ -233,7 +235,7 @@ void Update()
     switch (state)
     {
         case 1:
-            if (!vehicle.Sensors.IsGroundDetected())
+            if (!vehicle.Sensors.IsGroundDetected() && !busy)
             {
                 state = 3;
                 break;
